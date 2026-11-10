@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.env
+
+# Data and artefacts never go in git; see configs/datasets.yaml for sources.
+data/
+experiments/**/runs/
+*.pt
+*.ckpt
+mlruns/

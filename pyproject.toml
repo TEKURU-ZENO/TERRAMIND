@@ -1,0 +1,50 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "terramind"
+version = "0.0.1"
+description = "TERRA MIND: uncertainty-aware geospatial decision intelligence (Sprint 0: data foundation and flood baseline)"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "numpy>=1.26",
+    "rasterio>=1.3",
+    "geopandas>=1.0",
+    "shapely>=2.0",
+    "pyproj>=3.6",
+    "pystac-client>=0.8",
+    "pydantic>=2.6",
+    "pyyaml>=6.0",
+    "typer>=0.12",
+    "requests>=2.31",
+    "tqdm>=4.66",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "pillow>=10",
+    "networkx>=3.2",
+    "qdrant-client>=1.9",
+    "sentence-transformers>=3.0",
+    "langgraph>=0.2",
+    "scipy>=1.11",
+    "gymnasium>=1.0",
+]
+
+[project.optional-dependencies]
+# torch is installed separately from the CUDA index, see README.
+dev = ["pytest>=8", "ruff>=0.6", "httpx>=0.27"]
+
+[project.scripts]
+terramind = "terramind.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/terramind"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["network: needs internet access (deselect with -m 'not network')"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

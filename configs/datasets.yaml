@@ -1,0 +1,169 @@
+# Dataset and licence registry.
+#
+# Every dataset must have an entry here before code reads it.
+# `licence_verified: false` means the licence text below is from memory and has
+# NOT been checked against the provider's current terms. Check it, set the flag
+# to true and fill `licence_checked_on` before redistributing anything derived
+# from that dataset or publishing results.
+
+datasets:
+  - id: sentinel-1-grd
+    name: Sentinel-1 GRD (C-band SAR)
+    provider: ESA / Copernicus
+    access_url: https://dataspace.copernicus.eu/
+    stac_collection: sentinel-1-grd
+    modality: sar
+    resolution: 10 m
+    licence: Copernicus Sentinel data terms (free, full and open; attribution required)
+    licence_verified: false
+    redistribution: allowed-with-attribution
+    used_for: [flood-mapping]
+
+  - id: sentinel-2-l2a
+    name: Sentinel-2 L2A (multispectral optical)
+    provider: ESA / Copernicus
+    access_url: https://dataspace.copernicus.eu/
+    stac_collection: sentinel-2-l2a
+    modality: optical
+    resolution: 10-60 m
+    licence: Copernicus Sentinel data terms (free, full and open; attribution required)
+    licence_verified: false
+    redistribution: allowed-with-attribution
+    used_for: [land-cover, flood-mapping]
+
+  - id: landsat-c2-l2
+    name: Landsat 8/9 Collection 2 Level-2
+    provider: USGS / NASA
+    access_url: https://www.usgs.gov/landsat-missions/landsat-data-access
+    stac_collection: landsat-c2-l2
+    modality: optical-thermal
+    resolution: 30 m
+    licence: US public domain
+    licence_verified: false
+    redistribution: allowed
+    used_for: [urban-heat, land-use-change]
+
+  - id: cop-dem-glo-30
+    name: Copernicus DEM GLO-30
+    provider: ESA / Copernicus
+    access_url: https://dataspace.copernicus.eu/
+    stac_collection: cop-dem-glo-30
+    modality: terrain
+    resolution: 30 m
+    licence: Copernicus DEM licence (free with attribution)
+    licence_verified: false
+    redistribution: allowed-with-attribution
+    used_for: [terrain, hydrology]
+
+  - id: srtm
+    name: SRTM
+    provider: NASA / USGS
+    access_url: https://www.earthdata.nasa.gov/
+    modality: terrain
+    resolution: 30 m
+    licence: US public domain
+    licence_verified: false
+    redistribution: allowed
+    used_for: [terrain]
+
+  - id: era5
+    name: ERA5 reanalysis
+    provider: ECMWF / Copernicus Climate Change Service
+    access_url: https://cds.climate.copernicus.eu/
+    modality: weather
+    resolution: 0.25 deg, hourly
+    licence: CC BY 4.0 (previously Copernicus licence; confirm which applies)
+    licence_verified: false
+    redistribution: allowed-with-attribution
+    used_for: [weather-context]
+
+  - id: gpm-imerg
+    name: GPM IMERG precipitation
+    provider: NASA
+    access_url: https://gpm.nasa.gov/data/imerg
+    modality: weather
+    resolution: 0.1 deg, half-hourly
+    licence: NASA open data policy
+    licence_verified: false
+    redistribution: allowed
+    used_for: [rainfall]
+
+  - id: worldpop
+    name: WorldPop population grids
+    provider: WorldPop, University of Southampton
+    access_url: https://www.worldpop.org/
+    modality: population
+    resolution: 100 m
+    licence: CC BY 4.0
+    licence_verified: false
+    redistribution: allowed-with-attribution
+    used_for: [exposure]
+
+  - id: ghsl
+    name: Global Human Settlement Layer
+    provider: European Commission JRC
+    access_url: https://human-settlement.emergency.copernicus.eu/
+    modality: population-built
+    resolution: 10 m - 1 km
+    licence: CC BY 4.0
+    licence_verified: false
+    redistribution: allowed-with-attribution
+    used_for: [exposure, built-environment]
+
+  - id: openstreetmap
+    name: OpenStreetMap
+    provider: OpenStreetMap contributors
+    access_url: https://www.openstreetmap.org/
+    modality: vector-infrastructure
+    resolution: vector
+    licence: ODbL 1.0 (share-alike applies to derived databases)
+    licence_verified: false
+    redistribution: share-alike
+    used_for: [roads, infrastructure]
+
+  - id: geoboundaries
+    name: geoBoundaries
+    provider: William & Mary geoLab
+    access_url: https://www.geoboundaries.org/
+    modality: vector-admin
+    resolution: vector
+    licence: CC BY 4.0 (gbOpen release)
+    licence_verified: false
+    redistribution: allowed-with-attribution
+    used_for: [admin-boundaries]
+
+  - id: sen1floods11
+    name: Sen1Floods11
+    provider: Cloud to Street (Bonafilia et al., CVPR Workshops 2020)
+    access_url: https://github.com/cloudtostreet/Sen1Floods11
+    modality: sar-optical-labels
+    resolution: 10 m, 512x512 chips
+    licence: see repository; not confirmed
+    licence_verified: false
+    redistribution: unknown
+    used_for: [flood-segmentation-baseline]
+    notes: >
+      446 hand-labelled chips across 11 flood events. Official split holds out
+      Bolivia as a geographically unseen test set.
+
+  - id: xbd
+    name: xBD / xView2
+    provider: DIU / Carnegie Mellon SEI
+    access_url: https://xview2.org/
+    modality: optical-vhr-labels
+    resolution: < 1 m
+    licence: CC BY-NC-SA 4.0 (non-commercial)
+    licence_verified: false
+    redistribution: non-commercial-share-alike
+    used_for: [damage-assessment]
+
+  - id: spacenet
+    name: SpaceNet
+    provider: SpaceNet LLC
+    access_url: https://spacenet.ai/datasets/
+    modality: optical-vhr-labels
+    resolution: 0.3-0.5 m
+    licence: CC BY-SA 4.0
+    licence_verified: false
+    redistribution: share-alike
+    used_for: [buildings, roads]

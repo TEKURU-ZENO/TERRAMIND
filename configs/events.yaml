@@ -1,0 +1,56 @@
+# Flood events and geographic splits.
+
+# Labelled benchmark: Sen1Floods11 hand-labelled chips, official split.
+# Counts are from the published split CSVs. The split is by chip within the
+# ten in-distribution events, so `test` measures in-distribution performance
+# only. `bolivia` is the geographically unseen test and is the number that
+# matters for transfer claims.
+sen1floods11:
+  splits:
+    train: {file: flood_train_data.csv, chips: 252}
+    valid: {file: flood_valid_data.csv, chips: 89}
+    test: {file: flood_test_data.csv, chips: 90}
+    bolivia: {file: flood_bolivia_data.csv, chips: 15, role: geographic-holdout}
+  in_distribution_events:
+    [Ghana, India, Mekong, Nigeria, Pakistan, Paraguay, Somalia, Spain, Sri-Lanka, USA]
+  held_out_events: [Bolivia]
+  todo: >
+    Add leave-one-event-out folds. A single 15-chip holdout is too small for
+    confidence intervals; bootstrap at event level, not pixel level.
+
+# Candidate events for STAC discovery and later multimodal work.
+# Boxes are approximate (west, south, east, north in EPSG:4326) and date
+# windows are approximate. Confirm both against event reports before using an
+# event in an experiment.
+events:
+  - id: chennai-2015
+    name: Chennai floods
+    region: South Asia
+    bbox: [79.95, 12.80, 80.35, 13.25]
+    start: "2015-11-08"
+    end: "2015-12-15"
+    confirmed: false
+
+  - id: kerala-2018
+    name: Kerala floods
+    region: South Asia
+    bbox: [76.20, 9.40, 76.80, 10.30]
+    start: "2018-08-08"
+    end: "2018-08-31"
+    confirmed: false
+
+  - id: ahr-2021
+    name: Western Germany (Ahr valley) floods
+    region: Europe
+    bbox: [6.80, 50.40, 7.30, 50.65]
+    start: "2021-07-12"
+    end: "2021-07-31"
+    confirmed: false
+
+  - id: sindh-2022
+    name: Pakistan (Sindh) floods
+    region: South Asia
+    bbox: [67.50, 26.00, 68.80, 27.80]
+    start: "2022-08-15"
+    end: "2022-09-30"
+    confirmed: false
