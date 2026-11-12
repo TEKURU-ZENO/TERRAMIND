@@ -22,10 +22,14 @@ policy does not beat a five-step lookahead. When we make mistakes costly, by
 charging for deployments to dry cells, calibration starts to matter on the
 test events (up to +0.09 utility) but not on the unseen region, uncertainty
 helps in one of six cases, and a better sensor helps most; a learned policy
-falls 0.19 behind the planner. On 49 frozen questions, the evidence-checked
-agent workflow beats a fixed retrieval pipeline but not a single small LLM
-agent; its critic ensures cited numbers are real but not that they answer the
-question. Intervals that resample flood events are an
+trained from scratch falls 0.19 behind the planner, and one that first imitates
+the planner comes within noise of it without beating it. On 49 held-out
+questions, the evidence-checked agent workflow beats a fixed retrieval pipeline
+but not a single small LLM agent, and its critic never changes an answer. A
+geospatial foundation model (Prithvi-EO-2.0) underperforms a small U-Net,
+especially on the unseen region; a fused radar-optical model collapses when the
+optical bands are missing; and a graph network over road topology adds nothing
+to the flood map for finding flooded roads. Intervals that resample flood events are an
 order of magnitude wider than seed noise, which changes how several of these
 comparisons should be read. We report the negative results in full.
 
@@ -133,7 +137,7 @@ episodes.
 | RQ3 | Can uncertainty identify where to abstain? | Supported at pixel level |
 | RQ4 | Does hybrid spatial retrieval help? | Supported for the hybrid score; not for the graph component |
 | RQ5 | Are specialised agents more reliable? | Supported against a fixed pipeline; not distinguishable from one LLM agent |
-| RQ6 | Does RL beat heuristic and optimisation baselines? | Not supported, in both tasks |
+| RQ6 | Does RL beat heuristic and optimisation baselines? | Not supported, in both tasks; imitation + PPO comes within noise |
 | RQ7 | Does the integrated chain improve decisions? | Partly: perception matters, uncertainty and calibration barely do |
 | RQ7b | When mistakes cost something, do calibration and uncertainty help? | Calibration: in seen regions; uncertainty: rarely; neither in the unseen region |
 
@@ -227,6 +231,44 @@ the LLM refuses all 12 but also refuses 5 answerable questions, picks the
 wrong one of two similar records, and cannot count scenes from 8 records.
 Removing the critic changes accuracy by 0.00 [-0.06, +0.06].
 
+These failures were found on that set, so it became the development set. A
+second set of 49 questions with new wording, targets and 16 new unanswerable
+questions was frozen before TerraCore was changed. Fixes developed on the
+first set only (refuse names absent from the store, no default answer for an
+unrecognised question type, look up named policies and datasets) raise
+held-out accuracy from 0.59 to 0.88 (+0.29 [0.16, 0.41]) and refusals of
+unanswerable questions from 2 to 13 of 16. On the held-out set TerraCore scores
+0.88 and the LLM agent 0.78 (+0.10 [-0.04, +0.24]); the critic again changes
+nothing. Calibration questions all fail: no agent looks them up for a named
+place.
+
+### 5.9 Further experiments
+
+**Foundation model (E2).** Prithvi-EO-2.0-100M-TL, fine-tuned with a small
+decoder on six optical bands, reaches 0.817 test and 0.691 Bolivia IoU (3
+seeds), against 0.839 and 0.782 for a U-Net on the same bands; frozen, 0.801
+and 0.662. The pretrained model transfers worse to the unseen region.
+
+**Missing sensors (E1).** The early-fusion model scores 0.280 on test and 0.029
+on Bolivia with the optical bands removed, far below a radar-only model (0.657,
+0.640). Modality dropout restores the optical-only case (0.823) but lifts
+radar-only only to 0.508. Late fusion with a weight tuned on validation puts
+0.9 on optical and matches optical alone.
+
+**Learned dispatch policies (RQ6).** Imitating the calibrated planner then
+fine-tuning with PPO reaches 0.575 utility on test against the planner's 0.596
+(-0.021 [-0.047, +0.005]); imitation alone 0.455, PPO from scratch 0.404, a
+MAPPO global critic 0.559.
+
+**Forecasting (E3).** For GloFAS discharge at the 15 event sites, persistence
+has median NSE 0.985, 0.941 and 0.823 at 1, 3 and 7 days; a GRU on 30 days of
+discharge and rain lowers squared error by 27%, 17% and 16%. GloFAS itself
+exceeds its flood threshold at only 10 of 13 test-period events.
+
+**Flooded roads (E10).** On 813k OSM road points, thresholding the
+out-of-event radar flood probability gives F1 0.626 on test; a per-point MLP
+with terrain and road features 0.617, GraphSAGE over the road graph 0.599.
+
 ## 6. Discussion
 
 The chain works mechanically, but its premise is borne out only in part. In
@@ -255,9 +297,17 @@ cautious to a fault, but loose with which record it uses. A system that
 deserves trust needs both checks, and our results do not show that splitting
 the work into specialised agents is what delivers either.
 
-The learned policy is weaker than planning in both tasks. With 45 training
-scenarios and no tuning it partly memorises them, and a planner given a good
-estimate of expected utility has little left for it to learn.
+The learned policy is weaker than planning in both tasks. From scratch, with
+45 training scenarios, it partly memorises them; started from the planner by
+imitation, RL recovers most of the gap but finds nothing the planner misses.
+
+The other additions repeat one pattern: more machinery on top of a decent flood
+map rarely helps. A large pretrained encoder transfers worse than a small
+network trained on the task; a road graph adds nothing to the per-point flood
+probability; a learned forecaster barely beats persistence. Where something
+does help, it is better input (optical over radar), or a system design that
+keeps a dedicated radar model for when optical data are missing, rather than
+one fused model.
 
 What a fuller test still needs: need weighted by exposure, travel costs
 through flooded cells, forecasts rather than snapshots, recalibration on the
@@ -268,7 +318,9 @@ one event.
 
 - One benchmark, 446 chips; the unseen region is a single event of 15 chips,
   so no event-level interval exists for it.
-- No foundation-model comparison (E2), no forecasting (E3), no graph model.
+- One foundation model (100M, one recipe, no time/location inputs); forecasts
+  target simulated GloFAS discharge, not gauges; road labels are pixel water at
+  the road point, not passability.
 - Labels include permanent water and exclude cloudy pixels, which removes the
   case radar exists for.
 - Leave-one-event-out uses one seed per fold and more training chips than the
@@ -279,11 +331,12 @@ one event.
   dispatch task the waste cost and the 5% dry threshold are arbitrary, and
   the single uncertainty gain would not survive a correction for six
   comparisons.
-- PPO used one configuration with no tuning in both tasks.
+- RL tuning used one seed on 10 held-out scenarios; the gain seen there did
+  not hold on the test set.
 - The RQ5 questions were written by the author of TerraCore's rules and their
   gold facts come from the store the systems read; 49 questions and one small
-  local LLM. TerraCore's relevance gap was found on these questions, so a fix
-  must be judged on new ones.
+  local LLM. The held-out set was written by the same person after seeing
+  the first set's failures.
 - Dataset licences other than Sen1Floods11's absence of one are unverified.
 
 ## 8. Reproducibility

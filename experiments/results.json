@@ -2440,6 +2440,86 @@
                     0.42279478907585144,
                     0.4447350800037384
                   ]
+                },
+                "imitation": {
+                  "utility": 0.45514172315597534,
+                  "utility_ci95": [
+                    0.3841317296028137,
+                    0.5219445824623108
+                  ],
+                  "served": 0.5188349485397339,
+                  "wasted_deployments": 1.352272629737854,
+                  "deployments": 33.36742401123047,
+                  "vs_reference": -0.14085344970226288,
+                  "vs_reference_ci95": [
+                    -0.17900633811950684,
+                    -0.10754536837339401
+                  ],
+                  "utility_by_seed": [
+                    0.46381422877311707,
+                    0.45875927805900574,
+                    0.44285157322883606
+                  ]
+                },
+                "imitation + ppo": {
+                  "utility": 0.5749948024749756,
+                  "utility_ci95": [
+                    0.5079290270805359,
+                    0.6410775184631348
+                  ],
+                  "served": 0.6063541769981384,
+                  "wasted_deployments": 0.7708333730697632,
+                  "deployments": 39.69507598876953,
+                  "vs_reference": -0.021000344306230545,
+                  "vs_reference_ci95": [
+                    -0.04696359112858772,
+                    0.004507521167397499
+                  ],
+                  "utility_by_seed": [
+                    0.5719142556190491,
+                    0.5679067969322205,
+                    0.5851632952690125
+                  ]
+                },
+                "imitation + ppo, no uncertainty input": {
+                  "utility": 0.5635774731636047,
+                  "utility_ci95": [
+                    0.4962711036205292,
+                    0.6288629770278931
+                  ],
+                  "served": 0.5913547873497009,
+                  "wasted_deployments": 0.7159091234207153,
+                  "deployments": 38.623111724853516,
+                  "vs_reference": -0.03241762891411781,
+                  "vs_reference_ci95": [
+                    -0.058105215430259705,
+                    -0.009578255005180836
+                  ],
+                  "utility_by_seed": [
+                    0.5669832825660706,
+                    0.5546391606330872,
+                    0.569110095500946
+                  ]
+                },
+                "imitation + mappo": {
+                  "utility": 0.5586463809013367,
+                  "utility_ci95": [
+                    0.4924004375934601,
+                    0.6222593784332275
+                  ],
+                  "served": 0.5893295407295227,
+                  "wasted_deployments": 0.7708332538604736,
+                  "deployments": 38.0625,
+                  "vs_reference": -0.03734874352812767,
+                  "vs_reference_ci95": [
+                    -0.06118295341730118,
+                    -0.015520238317549229
+                  ],
+                  "utility_by_seed": [
+                    0.5426469445228577,
+                    0.5562443137168884,
+                    0.5770479440689087
+                  ]
                 }
               }
             },
@@ -2559,6 +2639,86 @@
                     0.32515695691108704,
                     0.3493971824645996,
                     0.3373425304889679
+                  ]
+                },
+                "imitation": {
+                  "utility": 0.3775869309902191,
+                  "utility_ci95": [
+                    0.2711379826068878,
+                    0.4660574793815613
+                  ],
+                  "served": 0.4668618142604828,
+                  "wasted_deployments": 1.9318181276321411,
+                  "deployments": 28.56818199157715,
+                  "vs_reference": -0.1335151493549347,
+                  "vs_reference_ci95": [
+                    -0.19066597521305084,
+                    -0.08230192959308624
+                  ],
+                  "utility_by_seed": [
+                    0.38835594058036804,
+                    0.38700154423713684,
+                    0.3574031889438629
+                  ]
+                },
+                "imitation + ppo": {
+                  "utility": 0.519856870174408,
+                  "utility_ci95": [
+                    0.3926713168621063,
+                    0.63180011510849
+                  ],
+                  "served": 0.5972467064857483,
+                  "wasted_deployments": 1.5681819915771484,
+                  "deployments": 35.10606002807617,
+                  "vs_reference": 0.008754793554544449,
+                  "vs_reference_ci95": [
+                    -0.036704353988170624,
+                    0.055864669382572174
+                  ],
+                  "utility_by_seed": [
+                    0.49939510226249695,
+                    0.5311733484268188,
+                    0.5290020704269409
+                  ]
+                },
+                "imitation + ppo, no uncertainty input": {
+                  "utility": 0.5013241171836853,
+                  "utility_ci95": [
+                    0.3851092457771301,
+                    0.6007362604141235
+                  ],
+                  "served": 0.5700613260269165,
+                  "wasted_deployments": 1.4015151262283325,
+                  "deployments": 33.95454406738281,
+                  "vs_reference": -0.009777907282114029,
+                  "vs_reference_ci95": [
+                    -0.051075611263513565,
+                    0.03021404519677162
+                  ],
+                  "utility_by_seed": [
+                    0.49447622895240784,
+                    0.48453810811042786,
+                    0.524958074092865
+                  ]
+                },
+                "imitation + mappo": {
+                  "utility": 0.5112172365188599,
+                  "utility_ci95": [
+                    0.4252389371395111,
+                    0.5921602845191956
+                  ],
+                  "served": 0.5781561136245728,
+                  "wasted_deployments": 1.3863635063171387,
+                  "deployments": 33.522727966308594,
+                  "vs_reference": 0.0001151832693722099,
+                  "vs_reference_ci95": [
+                    -0.04637397825717926,
+                    0.047163255512714386
+                  ],
+                  "utility_by_seed": [
+                    0.4917270541191101,
+                    0.5177440047264099,
+                    0.5241806507110596
                   ]
                 }
               }
@@ -2735,300 +2895,339 @@
     "agents": {
       "questions": [
         {
-          "id": "perf-0",
+          "id": "t-perf-0",
           "category": "performance",
-          "text": "What water IoU does the optical model reach on the Spain flood event?",
+          "text": "Which IoU score does the optical U-Net achieve for the Nigeria flood?",
           "answerable": true,
           "numbers": [
-            0.848
+            0.939
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s2:event:Spain"
+            "benchmark:s2:event:Nigeria"
           ]
         },
         {
-          "id": "perf-1",
+          "id": "t-perf-1",
           "category": "performance",
-          "text": "How accurate is flood mapping from radar imagery for Ghana?",
+          "text": "How reliable is radar flood mapping in Somalia, in terms of IoU?",
           "answerable": true,
           "numbers": [
-            0.512
+            0.453
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s1:event:Ghana"
+            "benchmark:s1:event:Somalia"
           ]
         },
         {
-          "id": "perf-2",
+          "id": "t-perf-2",
           "category": "performance",
-          "text": "Give the IoU of the radar U-Net in Pakistan.",
+          "text": "For Spain, what is the fused model's water IoU?",
           "answerable": true,
           "numbers": [
-            0.184
+            0.831
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s1:event:Pakistan"
+            "benchmark:s1s2:event:Spain"
           ]
         },
         {
-          "id": "perf-3",
+          "id": "t-perf-3",
           "category": "performance",
-          "text": "What IoU does the optical model get on the Pakistan flood?",
+          "text": "What is the intersection over union of the optical model on the Ghana event?",
           "answerable": true,
           "numbers": [
-            0.823
+            0.546
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s2:event:Pakistan"
+            "benchmark:s2:event:Ghana"
           ]
         },
         {
-          "id": "perf-4",
+          "id": "t-perf-4",
           "category": "performance",
-          "text": "How well does the fused model map water for the Mekong event?",
+          "text": "Tell me how the optical model scores on the USA flood.",
           "answerable": true,
           "numbers": [
-            0.927
+            0.792
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s1s2:event:Mekong"
+            "benchmark:s2:event:USA"
           ]
         },
         {
-          "id": "perf-5",
+          "id": "t-perf-5",
           "category": "performance",
-          "text": "What is the optical model's water IoU for Somalia?",
+          "text": "What water IoU is reported for the fused model in India?",
           "answerable": true,
           "numbers": [
-            0.799
+            0.883
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s2:event:Somalia"
+            "benchmark:s1s2:event:India"
           ]
         },
         {
-          "id": "perf-6",
+          "id": "t-perf-6",
           "category": "performance",
-          "text": "How good is the radar model on the USA flood event?",
+          "text": "How does the radar model do on the Paraguay flood, measured by IoU?",
           "answerable": true,
           "numbers": [
-            0.514
+            0.562
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s1:event:USA"
+            "benchmark:s1:event:Paraguay"
           ]
         },
         {
-          "id": "perf-7",
+          "id": "t-perf-7",
           "category": "performance",
-          "text": "Report the IoU of the fused U-Net on Paraguay.",
+          "text": "What is the radar U-Net's IoU for the Sri Lanka event?",
           "answerable": true,
           "numbers": [
-            0.738
+            0.864
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s1s2:event:Paraguay"
+            "benchmark:s1:event:Sri-Lanka"
           ]
         },
         {
-          "id": "perf-8",
+          "id": "t-perf-8",
           "category": "performance",
-          "text": "What water IoU does the optical model achieve in India?",
+          "text": "What IoU does the optical model achieve on the Mekong flood?",
           "answerable": true,
           "numbers": [
-            0.896
+            0.932
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s2:event:India"
+            "benchmark:s2:event:Mekong"
           ]
         },
         {
-          "id": "perf-9",
+          "id": "t-perf-9",
           "category": "performance",
-          "text": "How accurately does the radar model detect flood water in Nigeria?",
+          "text": "Water IoU of the fused model for Somalia?",
           "answerable": true,
           "numbers": [
-            0.862
+            0.784
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s1:event:Nigeria"
+            "benchmark:s1s2:event:Somalia"
           ]
         },
         {
-          "id": "perf-10",
-          "category": "performance",
-          "text": "What IoU does the fused model reach for Sri Lanka?",
-          "answerable": true,
-          "numbers": [
-            0.901
-          ],
-          "counts": [],
-          "strings": [],
-          "support": [
-            "benchmark:s1s2:event:Sri-Lanka"
-          ]
-        },
-        {
-          "id": "perf-11",
-          "category": "performance",
-          "text": "What IoU does the radar model get in Cambodia?",
-          "answerable": true,
-          "numbers": [
-            0.838
-          ],
-          "counts": [],
-          "strings": [],
-          "support": [
-            "benchmark:s1:event:Mekong"
-          ]
-        },
-        {
-          "id": "perf-12",
-          "category": "performance",
-          "text": "How well does the radar model perform on the unseen Bolivia region?",
-          "answerable": true,
-          "numbers": [
-            0.628
-          ],
-          "counts": [],
-          "strings": [],
-          "support": [
-            "benchmark:s1:event:Bolivia"
-          ]
-        },
-        {
-          "id": "perf-13",
-          "category": "performance",
-          "text": "What water IoU does the optical model reach in Bolivia?",
-          "answerable": true,
-          "numbers": [
-            0.802
-          ],
-          "counts": [],
-          "strings": [],
-          "support": [
-            "benchmark:s2:event:Bolivia"
-          ]
-        },
-        {
-          "id": "perf-14",
-          "category": "performance",
-          "text": "What IoU does the fused model get on Bolivia?",
-          "answerable": true,
-          "numbers": [
-            0.757
-          ],
-          "counts": [],
-          "strings": [],
-          "support": [
-            "benchmark:s1s2:event:Bolivia"
-          ]
-        },
-        {
-          "id": "transfer-0",
+          "id": "t-transfer-0",
           "category": "transfer",
-          "text": "If Spain is left out of training, what IoU does the radar model get on its test chips?",
+          "text": "When Nigeria chips are removed from training, what IoU does the radar model reach on Nigeria's test chips?",
           "answerable": true,
           "numbers": [
-            0.74
+            0.851
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s1:loeo:Spain"
+            "benchmark:s1:loeo:Nigeria"
           ]
         },
         {
-          "id": "transfer-1",
+          "id": "t-transfer-1",
           "category": "transfer",
-          "text": "With Pakistan held out of training, how does the optical model score on it?",
+          "text": "How does the optical model score on USA after training without any USA data?",
           "answerable": true,
           "numbers": [
-            0.78
+            0.771
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s2:loeo:Pakistan"
+            "benchmark:s2:loeo:USA"
           ]
         },
         {
-          "id": "transfer-2",
+          "id": "t-transfer-2",
           "category": "transfer",
-          "text": "What IoU does the fused model reach on Ghana when Ghana is excluded from training?",
+          "text": "Held-out evaluation: IoU of the fused model on Paraguay when Paraguay is not in training?",
           "answerable": true,
           "numbers": [
-            0.518
+            0.722
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s1s2:loeo:Ghana"
+            "benchmark:s1s2:loeo:Paraguay"
           ]
         },
         {
-          "id": "transfer-3",
+          "id": "t-transfer-3",
           "category": "transfer",
-          "text": "How well does the optical model transfer to Somalia if it never saw Somalia in training?",
+          "text": "If the radar model never sees Mekong during training, what is its IoU there?",
           "answerable": true,
           "numbers": [
-            0.758
+            0.828
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s2:loeo:Somalia"
+            "benchmark:s1:loeo:Mekong"
           ]
         },
         {
-          "id": "transfer-4",
-          "category": "transfer",
-          "text": "Leave-one-event-out: what is the radar model's IoU on India?",
+          "id": "t-calib-0",
+          "category": "calibration",
+          "text": "What is the calibration error of the radar ensemble on Bolivia after temperature scaling?",
           "answerable": true,
           "numbers": [
-            0.706
+            0.012
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "benchmark:s1:loeo:India"
+            "benchmark:s1:calibration:bolivia"
           ]
         },
         {
-          "id": "scenes-0",
+          "id": "t-calib-1",
+          "category": "calibration",
+          "text": "What expected calibration error does the optical ensemble have on the test split before any scaling?",
+          "answerable": true,
+          "numbers": [
+            0.018
+          ],
+          "counts": [],
+          "strings": [],
+          "support": [
+            "benchmark:s2:calibration:test"
+          ]
+        },
+        {
+          "id": "t-calib-2",
+          "category": "calibration",
+          "text": "What error rate does the fused ensemble have on Bolivia when it abstains on its least confident 10% of pixels?",
+          "answerable": true,
+          "numbers": [
+            0.01
+          ],
+          "counts": [],
+          "strings": [],
+          "support": [
+            "benchmark:s1s2:calibration:bolivia"
+          ]
+        },
+        {
+          "id": "t-scenes-0",
           "category": "scenes",
-          "text": "How many Sentinel-2 scenes cover the Kerala floods in August 2018?",
+          "text": "How many Sentinel-1 scenes cover the Sindh floods in September 2022?",
           "answerable": true,
           "numbers": [],
           "counts": [
-            18
+            25
           ],
           "strings": [],
           "support": [
-            "scene:S2A_MSIL2A_20180810T051651_N0500_R062_T43PFM_20230711T045107",
-            "scene:S2A_MSIL2A_20180810T051651_N0500_R062_T43PFL_20230711T045107",
-            "scene:S2B_MSIL2A_20180812T050649_N0500_R019_T43PFM_20230623T130932",
-            "scene:S2B_MSIL2A_20180812T050649_N0500_R019_T43PFL_20230623T130932",
+            "scene:S1A_IW_GRDH_1SDV_20220903T132730_20220903T132800_044841_055AF2",
+            "scene:S1A_IW_GRDH_1SDV_20220903T132800_20220903T132825_044841_055AF2",
+            "scene:S1A_IW_GRDH_1SDV_20220903T132825_20220903T132850_044841_055AF2",
+            "scene:S1A_IW_GRDH_1SDV_20220906T011734_20220906T011759_044877_055C32",
+            "scene:S1A_IW_GRDH_1SDV_20220906T011759_20220906T011824_044877_055C32",
+            "scene:S1A_IW_GRDH_1SDV_20220908T133545_20220908T133610_044914_055D60",
+            "scene:S1A_IW_GRDH_1SDV_20220908T133610_20220908T133635_044914_055D60",
+            "scene:S1A_IW_GRDH_1SDV_20220908T133635_20220908T133700_044914_055D60",
+            "scene:S1A_IW_GRDH_1SDV_20220911T012551_20220911T012616_044950_055EA1",
+            "scene:S1A_IW_GRDH_1SDV_20220911T012616_20220911T012641_044950_055EA1",
+            "scene:S1A_IW_GRDH_1SDV_20220915T132731_20220915T132800_045016_0560D1",
+            "scene:S1A_IW_GRDH_1SDV_20220915T132800_20220915T132825_045016_0560D1",
+            "scene:S1A_IW_GRDH_1SDV_20220915T132825_20220915T132850_045016_0560D1",
+            "scene:S1A_IW_GRDH_1SDV_20220918T011734_20220918T011759_045052_056210",
+            "scene:S1A_IW_GRDH_1SDV_20220918T011759_20220918T011824_045052_056210",
+            "scene:S1A_IW_GRDH_1SDV_20220920T133544_20220920T133609_045089_05634C",
+            "scene:S1A_IW_GRDH_1SDV_20220920T133609_20220920T133634_045089_05634C",
+            "scene:S1A_IW_GRDH_1SDV_20220920T133634_20220920T133659_045089_05634C",
+            "scene:S1A_IW_GRDH_1SDV_20220923T012551_20220923T012616_045125_056484",
+            "scene:S1A_IW_GRDH_1SDV_20220923T012616_20220923T012641_045125_056484",
+            "scene:S1A_IW_GRDH_1SDV_20220927T132731_20220927T132800_045191_0566B6",
+            "scene:S1A_IW_GRDH_1SDV_20220927T132800_20220927T132825_045191_0566B6",
+            "scene:S1A_IW_GRDH_1SDV_20220927T132825_20220927T132850_045191_0566B6",
+            "scene:S1A_IW_GRDH_1SDV_20220930T011735_20220930T011800_045227_0567EA",
+            "scene:S1A_IW_GRDH_1SDV_20220930T011800_20220930T011825_045227_0567EA"
+          ]
+        },
+        {
+          "id": "t-scenes-1",
+          "category": "scenes",
+          "text": "How many Sentinel-2 images of Sindh were acquired in August 2022?",
+          "answerable": true,
+          "numbers": [],
+          "counts": [
+            34
+          ],
+          "strings": [],
+          "support": [
+            "scene:S2B_MSIL2A_20220816T055639_N0510_R091_T42RVR_20240721T162346",
+            "scene:S2B_MSIL2A_20220819T060639_N0510_R134_T42RVR_20240630T010657",
+            "scene:S2B_MSIL2A_20220819T060639_N0510_R134_T42RVQ_20240630T010657",
+            "scene:S2B_MSIL2A_20220819T060639_N0510_R134_T42RUR_20240630T010657",
+            "scene:S2B_MSIL2A_20220819T060639_N0510_R134_T42RUQ_20240630T010657",
+            "scene:S2B_MSIL2A_20220819T060639_N0510_R134_T42RUP_20240630T010657",
+            "scene:S2A_MSIL2A_20220821T055651_N0510_R091_T42RVR_20240721T014037",
+            "scene:S2A_MSIL2A_20220821T055651_N0510_R091_T42RVQ_20240721T014037",
+            "scene:S2A_MSIL2A_20220821T055651_N0510_R091_T42RVP_20240721T014037",
+            "scene:S2A_MSIL2A_20220821T055651_N0510_R091_T42RUR_20240721T014037",
+            "scene:S2A_MSIL2A_20220821T055651_N0510_R091_T42RUQ_20240721T014037",
+            "scene:S2A_MSIL2A_20220821T055651_N0510_R091_T42RUP_20240721T014037",
+            "scene:S2A_MSIL2A_20220824T060641_N0510_R134_T42RVR_20240629T120010",
+            "scene:S2A_MSIL2A_20220824T060641_N0510_R134_T42RVQ_20240629T120010",
+            "scene:S2A_MSIL2A_20220824T060641_N0510_R134_T42RUR_20240629T120010",
+            "scene:S2A_MSIL2A_20220824T060641_N0510_R134_T42RUQ_20240629T120010",
+            "scene:S2A_MSIL2A_20220824T060641_N0510_R134_T42RUP_20240629T120010",
+            "scene:S2B_MSIL2A_20220826T055639_N0510_R091_T42RVR_20240718T104826",
+            "scene:S2B_MSIL2A_20220826T055639_N0510_R091_T42RVQ_20240718T104826",
+            "scene:S2B_MSIL2A_20220826T055639_N0510_R091_T42RVP_20240718T104826",
+            "scene:S2B_MSIL2A_20220826T055639_N0510_R091_T42RUR_20240718T104826",
+            "scene:S2B_MSIL2A_20220826T055639_N0510_R091_T42RUQ_20240718T104826",
+            "scene:S2B_MSIL2A_20220826T055639_N0510_R091_T42RUP_20240718T104826",
+            "scene:S2B_MSIL2A_20220829T060629_N0510_R134_T42RVR_20240625T160338",
+            "scene:S2B_MSIL2A_20220829T060629_N0510_R134_T42RVQ_20240625T160338",
+            "scene:S2B_MSIL2A_20220829T060629_N0510_R134_T42RUR_20240625T160338",
+            "scene:S2B_MSIL2A_20220829T060629_N0510_R134_T42RUQ_20240625T160338",
+            "scene:S2B_MSIL2A_20220829T060629_N0510_R134_T42RUP_20240625T160338",
+            "scene:S2A_MSIL2A_20220831T055651_N0510_R091_T42RVR_20240720T003836",
+            "scene:S2A_MSIL2A_20220831T055651_N0510_R091_T42RVQ_20240720T003836",
+            "scene:S2A_MSIL2A_20220831T055651_N0510_R091_T42RVP_20240720T003836",
+            "scene:S2A_MSIL2A_20220831T055651_N0510_R091_T42RUR_20240720T003836",
+            "scene:S2A_MSIL2A_20220831T055651_N0510_R091_T42RUQ_20240720T003836",
+            "scene:S2A_MSIL2A_20220831T055651_N0510_R091_T42RUP_20240720T003836"
+          ]
+        },
+        {
+          "id": "t-scenes-2",
+          "category": "scenes",
+          "text": "How many Sentinel-2 scenes of Kerala are there between 15 and 31 August 2018?",
+          "answerable": true,
+          "numbers": [],
+          "counts": [
+            14
+          ],
+          "strings": [],
+          "support": [
             "scene:S2B_MSIL2A_20180815T051649_N0500_R062_T43PFM_20230625T094025",
             "scene:S2B_MSIL2A_20180815T051649_N0500_R062_T43PFL_20230625T094025",
             "scene:S2A_MSIL2A_20180817T050651_N0500_R019_T43PFM_20230811T065617",
@@ -3046,106 +3245,9 @@
           ]
         },
         {
-          "id": "scenes-1",
+          "id": "t-scenes-3",
           "category": "scenes",
-          "text": "How many Sentinel-1 radar scenes were acquired over Kerala in August 2018?",
-          "answerable": true,
-          "numbers": [],
-          "counts": [
-            10
-          ],
-          "strings": [],
-          "support": [
-            "scene:S1A_IW_GRDH_1SDV_20180809T004043_20180809T004108_023162_02842B",
-            "scene:S1A_IW_GRDH_1SDV_20180809T004108_20180809T004133_023162_02842B",
-            "scene:S1A_IW_GRDH_1SDV_20180821T004044_20180821T004109_023337_0289D5",
-            "scene:S1A_IW_GRDH_1SDV_20180821T004109_20180821T004134_023337_0289D5",
-            "scene:S1A_IW_GRDH_1SDV_20180821T130602_20180821T130631_023345_028A0A",
-            "scene:S1A_IW_GRDH_1SDV_20180821T130631_20180821T130656_023345_028A0A",
-            "scene:S1B_IW_GRDH_1SDV_20180827T004000_20180827T004029_012441_016F10",
-            "scene:S1B_IW_GRDH_1SDV_20180827T004029_20180827T004054_012441_016F10",
-            "scene:S1B_IW_GRDH_1SDV_20180827T130533_20180827T130558_012449_016F4C",
-            "scene:S1B_IW_GRDH_1SDV_20180827T130558_20180827T130618_012449_016F4C"
-          ]
-        },
-        {
-          "id": "scenes-2",
-          "category": "scenes",
-          "text": "How many Sentinel-1 scenes cover the Ahr floods in July 2021?",
-          "answerable": true,
-          "numbers": [],
-          "counts": [
-            16
-          ],
-          "strings": [],
-          "support": [
-            "scene:S1B_IW_GRDH_1SDV_20210712T172404_20210712T172429_027764_03503E",
-            "scene:S1A_IW_GRDH_1SDV_20210713T171622_20210713T171647_038762_0492ED",
-            "scene:S1A_IW_GRDH_1SDV_20210713T171647_20210713T171712_038762_0492ED",
-            "scene:S1A_IW_GRDH_1SDV_20210715T055052_20210715T055117_038784_049389",
-            "scene:S1B_IW_GRDH_1SDV_20210716T054152_20210716T054217_027815_0351B0",
-            "scene:S1A_IW_GRDH_1SDV_20210718T172454_20210718T172519_038835_049522",
-            "scene:S1B_IW_GRDH_1SDV_20210719T171553_20210719T171618_027866_035336",
-            "scene:S1B_IW_GRDH_1SDV_20210721T055002_20210721T055027_027888_0353E2",
-            "scene:S1A_IW_GRDH_1SDV_20210722T054242_20210722T054307_038886_0496AA",
-            "scene:S1B_IW_GRDH_1SDV_20210724T172404_20210724T172429_027939_03556E",
-            "scene:S1A_IW_GRDH_1SDV_20210725T171623_20210725T171648_038937_049829",
-            "scene:S1A_IW_GRDH_1SDV_20210725T171648_20210725T171713_038937_049829",
-            "scene:S1A_IW_GRDH_1SDV_20210727T055052_20210727T055117_038959_0498CB",
-            "scene:S1B_IW_GRDH_1SDV_20210728T054152_20210728T054217_027990_0356D8",
-            "scene:S1A_IW_GRDH_1SDV_20210730T172454_20210730T172519_039010_049A54",
-            "scene:S1B_IW_GRDH_1SDV_20210731T171554_20210731T171619_028041_035850"
-          ]
-        },
-        {
-          "id": "scenes-3",
-          "category": "scenes",
-          "text": "How many Sentinel-2 images of the Ahr valley are there from July 2021?",
-          "answerable": true,
-          "numbers": [],
-          "counts": [
-            32
-          ],
-          "strings": [],
-          "support": [
-            "scene:S2B_MSIL2A_20210713T102559_N0500_R108_T32ULB_20230206T154821",
-            "scene:S2B_MSIL2A_20210713T102559_N0500_R108_T32ULA_20230206T154821",
-            "scene:S2B_MSIL2A_20210713T102559_N0500_R108_T31UGS_20230206T154821",
-            "scene:S2B_MSIL2A_20210713T102559_N0500_R108_T31UGR_20230206T154821",
-            "scene:S2B_MSIL2A_20210716T103629_N0500_R008_T32ULB_20230213T203829",
-            "scene:S2B_MSIL2A_20210716T103629_N0500_R008_T32ULA_20230213T203829",
-            "scene:S2B_MSIL2A_20210716T103629_N0500_R008_T31UGS_20230213T203829",
-            "scene:S2B_MSIL2A_20210716T103629_N0500_R008_T31UGR_20230213T203829",
-            "scene:S2A_MSIL2A_20210718T103031_N0500_R108_T32ULB_20230213T234707",
-            "scene:S2A_MSIL2A_20210718T103031_N0500_R108_T32ULA_20230213T234707",
-            "scene:S2A_MSIL2A_20210718T103031_N0500_R108_T31UGS_20230213T234707",
-            "scene:S2A_MSIL2A_20210718T103031_N0500_R108_T31UGR_20230213T234707",
-            "scene:S2A_MSIL2A_20210721T104031_N0500_R008_T32ULB_20230128T193135",
-            "scene:S2A_MSIL2A_20210721T104031_N0500_R008_T32ULA_20230128T193135",
-            "scene:S2A_MSIL2A_20210721T104031_N0500_R008_T31UGS_20230128T193135",
-            "scene:S2A_MSIL2A_20210721T104031_N0500_R008_T31UGR_20230128T193135",
-            "scene:S2B_MSIL2A_20210723T102559_N0500_R108_T32ULB_20230219T161024",
-            "scene:S2B_MSIL2A_20210723T102559_N0500_R108_T32ULA_20230219T161024",
-            "scene:S2B_MSIL2A_20210723T102559_N0500_R108_T31UGS_20230219T161024",
-            "scene:S2B_MSIL2A_20210723T102559_N0500_R108_T31UGR_20230219T161024",
-            "scene:S2B_MSIL2A_20210726T103629_N0500_R008_T32ULB_20230220T102417",
-            "scene:S2B_MSIL2A_20210726T103629_N0500_R008_T32ULA_20230220T102417",
-            "scene:S2B_MSIL2A_20210726T103629_N0500_R008_T31UGS_20230220T102417",
-            "scene:S2B_MSIL2A_20210726T103629_N0500_R008_T31UGR_20230220T102417",
-            "scene:S2A_MSIL2A_20210728T103031_N0500_R108_T32ULB_20230220T230835",
-            "scene:S2A_MSIL2A_20210728T103031_N0500_R108_T32ULA_20230220T230835",
-            "scene:S2A_MSIL2A_20210728T103031_N0500_R108_T31UGS_20230220T230835",
-            "scene:S2A_MSIL2A_20210728T103031_N0500_R108_T31UGR_20230220T230835",
-            "scene:S2A_MSIL2A_20210731T104031_N0500_R008_T32ULB_20230221T182040",
-            "scene:S2A_MSIL2A_20210731T104031_N0500_R008_T32ULA_20230221T182040",
-            "scene:S2A_MSIL2A_20210731T104031_N0500_R008_T31UGS_20230221T182040",
-            "scene:S2A_MSIL2A_20210731T104031_N0500_R008_T31UGR_20230221T182040"
-          ]
-        },
-        {
-          "id": "scenes-4",
-          "category": "scenes",
-          "text": "How many Sentinel-2 scenes cover Chennai between November and December 2015?",
+          "text": "How many optical Sentinel-2 scenes cover Chennai in November 2015?",
           "answerable": true,
           "numbers": [],
           "counts": [
@@ -3160,39 +3262,9 @@
           ]
         },
         {
-          "id": "scenes-5",
-          "category": "scenes",
-          "text": "How many Sentinel-1 radar passes are there over Chennai in November-December 2015?",
-          "answerable": true,
-          "numbers": [],
-          "counts": [
-            3
-          ],
-          "strings": [],
-          "support": [
-            "scene:S1A_IW_GRDH_1SDV_20151112T003120_20151112T003149_008564_00C241",
-            "scene:S1A_IW_GRDH_1SDV_20151124T003120_20151124T003149_008739_00C723",
-            "scene:S1A_IW_GRDH_1SDV_20151206T003120_20151206T003149_008914_00CC1F"
-          ]
-        },
-        {
-          "id": "licence-0",
+          "id": "t-licence-0",
           "category": "licence",
-          "text": "What licence applies to OpenStreetMap data?",
-          "answerable": true,
-          "numbers": [],
-          "counts": [],
-          "strings": [
-            "odbl"
-          ],
-          "support": [
-            "dataset:openstreetmap"
-          ]
-        },
-        {
-          "id": "licence-1",
-          "category": "licence",
-          "text": "Under what licence is WorldPop released?",
+          "text": "How is geoBoundaries licensed?",
           "answerable": true,
           "numbers": [],
           "counts": [],
@@ -3200,41 +3272,13 @@
             "cc by 4.0"
           ],
           "support": [
-            "dataset:worldpop"
+            "dataset:geoboundaries"
           ]
         },
         {
-          "id": "licence-2",
+          "id": "t-licence-1",
           "category": "licence",
-          "text": "What are the licence terms for the xBD dataset?",
-          "answerable": true,
-          "numbers": [],
-          "counts": [],
-          "strings": [
-            "cc by-nc-sa"
-          ],
-          "support": [
-            "dataset:xbd"
-          ]
-        },
-        {
-          "id": "licence-3",
-          "category": "licence",
-          "text": "Which licence covers the SpaceNet dataset?",
-          "answerable": true,
-          "numbers": [],
-          "counts": [],
-          "strings": [
-            "cc by-sa"
-          ],
-          "support": [
-            "dataset:spacenet"
-          ]
-        },
-        {
-          "id": "licence-4",
-          "category": "licence",
-          "text": "What is the licence of the SRTM elevation data?",
+          "text": "Can Landsat Collection 2 data be reused, and under what licence?",
           "answerable": true,
           "numbers": [],
           "counts": [],
@@ -3242,97 +3286,153 @@
             "public domain"
           ],
           "support": [
-            "dataset:srtm"
+            "dataset:landsat-c2-l2"
           ]
         },
         {
-          "id": "licence-5",
+          "id": "t-licence-2",
           "category": "licence",
-          "text": "What licence does the Sen1Floods11 dataset have?",
+          "text": "What licence does the Global Human Settlement Layer use?",
           "answerable": true,
           "numbers": [],
           "counts": [],
           "strings": [
-            "none stated"
+            "cc by 4.0"
           ],
           "support": [
-            "dataset:sen1floods11"
+            "dataset:ghsl"
           ]
         },
         {
-          "id": "sim-0",
+          "id": "t-licence-3",
+          "category": "licence",
+          "text": "What are the licence terms for GPM IMERG precipitation data?",
+          "answerable": true,
+          "numbers": [],
+          "counts": [],
+          "strings": [
+            "nasa open data"
+          ],
+          "support": [
+            "dataset:gpm-imerg"
+          ]
+        },
+        {
+          "id": "t-licence-4",
+          "category": "licence",
+          "text": "Which licence applies to the Copernicus DEM GLO-30?",
+          "answerable": true,
+          "numbers": [],
+          "counts": [],
+          "strings": [
+            "copernicus dem licence"
+          ],
+          "support": [
+            "dataset:cop-dem-glo-30"
+          ]
+        },
+        {
+          "id": "t-sim-0",
           "category": "simulation",
-          "text": "In the flood response simulation, what share of flooded area does the PPO policy reach on the test split?",
+          "text": "In the flood response simulation, what does the assignment policy reach on the test split?",
           "answerable": true,
           "numbers": [
-            0.521
+            0.529
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "simulation:e7:test:ppo"
+            "simulation:e7:test:assignment"
           ]
         },
         {
-          "id": "sim-1",
+          "id": "t-sim-1",
           "category": "simulation",
-          "text": "In the simulation, how does the lookahead planner score on Bolivia?",
+          "text": "In the simulation, what does the lookahead planner that sees the true flood extent score on Bolivia?",
           "answerable": true,
           "numbers": [
-            0.55
+            0.588
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "simulation:e7:bolivia:lookahead"
+            "simulation:e7:bolivia:oracle-lookahead"
           ]
         },
         {
-          "id": "sim-2",
+          "id": "t-sim-2",
           "category": "simulation",
-          "text": "What does the greedy policy score in the flood response simulation?",
+          "text": "In the dispatch simulation with a waste cost of 1, what utility does the planner using calibration plus uncertainty reach on the test split?",
           "answerable": true,
           "numbers": [
-            0.519
+            0.587
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "simulation:e7:test:greedy"
+            "simulation:e9:cost1.0:test:calibrated-uncertainty"
           ]
         },
         {
-          "id": "sim-3",
+          "id": "t-sim-3",
           "category": "simulation",
-          "text": "In the dispatch simulation with waste cost 0.5, what utility does the calibrated planner reach on the test split?",
+          "text": "In the dispatch simulation with waste cost 0.25, what utility does the calibrated optical planner reach on Bolivia?",
           "answerable": true,
           "numbers": [
-            0.596
+            0.64
           ],
           "counts": [],
           "strings": [],
           "support": [
-            "simulation:e9:cost0.5:test:calibrated"
+            "simulation:e9:cost0.25:bolivia:optical-calibrated"
           ]
         },
         {
-          "id": "sim-4",
-          "category": "simulation",
-          "text": "In the dispatch simulation, what utility does a planner that takes the map at face value reach when a wasted deployment costs 0.5?",
+          "id": "t-event-0",
+          "category": "event facts",
+          "text": "How many hand-labelled chips does the Ghana flood event have?",
           "answerable": true,
-          "numbers": [
-            0.557
+          "numbers": [],
+          "counts": [
+            53
           ],
-          "counts": [],
           "strings": [],
           "support": [
-            "simulation:e9:cost0.5:test:raw-map"
+            "event:s1f11-Ghana"
           ]
         },
         {
-          "id": "none-0",
+          "id": "t-event-1",
+          "category": "event facts",
+          "text": "How many labelled chips are there for Somalia in Sen1Floods11?",
+          "answerable": true,
+          "numbers": [],
+          "counts": [
+            26
+          ],
+          "strings": [],
+          "support": [
+            "event:s1f11-Somalia"
+          ]
+        },
+        {
+          "id": "t-event-2",
+          "category": "event facts",
+          "text": "How many hand-labelled Sen1Floods11 chips come from the USA event?",
+          "answerable": true,
+          "numbers": [],
+          "counts": [
+            69
+          ],
+          "strings": [],
+          "support": [
+            "event:s1f11-USA"
+          ]
+        },
+        {
+          "id": "t-none-0",
           "category": "unanswerable",
-          "text": "Which roads in Mumbai will flood in the next 48 hours?",
+          "text": "How many fatalities were recorded in the Sindh floods?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3340,9 +3440,9 @@
           "support": []
         },
         {
-          "id": "none-1",
+          "id": "t-none-1",
           "category": "unanswerable",
-          "text": "Forecast the flood extent in Jakarta for next week.",
+          "text": "How many millimetres of rain fell in Kerala in August 2018?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3350,9 +3450,9 @@
           "support": []
         },
         {
-          "id": "none-2",
+          "id": "t-none-2",
           "category": "unanswerable",
-          "text": "Will Chennai flood tomorrow?",
+          "text": "What were the insured losses from the Ahr floods?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3360,9 +3460,9 @@
           "support": []
         },
         {
-          "id": "none-3",
+          "id": "t-none-3",
           "category": "unanswerable",
-          "text": "How well does the flood model perform in Jakarta?",
+          "text": "How many people were displaced in Chennai in 2015?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3370,9 +3470,9 @@
           "support": []
         },
         {
-          "id": "none-4",
+          "id": "t-none-4",
           "category": "unanswerable",
-          "text": "How many Sentinel-2 scenes cover Mumbai in July 2023?",
+          "text": "What is the IoU of the radar model in Venice?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3380,9 +3480,9 @@
           "support": []
         },
         {
-          "id": "none-5",
+          "id": "t-none-5",
           "category": "unanswerable",
-          "text": "What is the water IoU of the radar model in Bangladesh?",
+          "text": "How many Sentinel-1 scenes cover Lagos in 2020?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3390,9 +3490,9 @@
           "support": []
         },
         {
-          "id": "none-6",
+          "id": "t-none-6",
           "category": "unanswerable",
-          "text": "How many people died in the 2018 Kerala floods?",
+          "text": "Predict next month's flood risk for Kerala.",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3400,9 +3500,9 @@
           "support": []
         },
         {
-          "id": "none-7",
+          "id": "t-none-7",
           "category": "unanswerable",
-          "text": "How much rain fell during the 2021 Ahr valley floods?",
+          "text": "Should rescue teams go to the Ahr valley or Sindh first?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3410,9 +3510,9 @@
           "support": []
         },
         {
-          "id": "none-8",
+          "id": "t-none-8",
           "category": "unanswerable",
-          "text": "What was the economic damage of the Sindh 2022 floods?",
+          "text": "Which hospitals in Chennai are inside the flood zone?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3420,9 +3520,9 @@
           "support": []
         },
         {
-          "id": "none-9",
+          "id": "t-none-9",
           "category": "unanswerable",
-          "text": "Which neighbourhoods of Chennai should be evacuated first?",
+          "text": "What IoU does the optical model reach on the 2024 Valencia floods?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3430,9 +3530,9 @@
           "support": []
         },
         {
-          "id": "none-10",
+          "id": "t-none-10",
           "category": "unanswerable",
-          "text": "How many people were exposed to flooding in Spain?",
+          "text": "Which satellite will pass over Sindh tomorrow?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3440,9 +3540,49 @@
           "support": []
         },
         {
-          "id": "none-11",
+          "id": "t-none-11",
           "category": "unanswerable",
-          "text": "Who funded the creation of the Sen1Floods11 dataset?",
+          "text": "How deep was the water in the Ahr valley?",
+          "answerable": false,
+          "numbers": [],
+          "counts": [],
+          "strings": [],
+          "support": []
+        },
+        {
+          "id": "t-none-12",
+          "category": "unanswerable",
+          "text": "What is the average elevation of the Bolivia chips?",
+          "answerable": false,
+          "numbers": [],
+          "counts": [],
+          "strings": [],
+          "support": []
+        },
+        {
+          "id": "t-none-13",
+          "category": "unanswerable",
+          "text": "How many buildings were damaged in Kerala?",
+          "answerable": false,
+          "numbers": [],
+          "counts": [],
+          "strings": [],
+          "support": []
+        },
+        {
+          "id": "t-none-14",
+          "category": "unanswerable",
+          "text": "Who drew the hand labels for the Sen1Floods11 chips?",
+          "answerable": false,
+          "numbers": [],
+          "counts": [],
+          "strings": [],
+          "support": []
+        },
+        {
+          "id": "t-none-15",
+          "category": "unanswerable",
+          "text": "What was the river discharge of the Mekong during the flood?",
           "answerable": false,
           "numbers": [],
           "counts": [],
@@ -3450,112 +3590,150 @@
           "support": []
         }
       ],
-      "fingerprint": "6e690dbc3f0c",
+      "fingerprint": "3281dec01689",
       "paired_accuracy": {
+        "terracore - terracore-v1": {
+          "mean": 0.2857142857142857,
+          "ci95": [
+            0.16326530612244897,
+            0.40816326530612246
+          ]
+        },
         "terracore - terracore-no-critic": {
           "mean": 0.0,
           "ci95": [
-            -0.061224489795918366,
-            0.061224489795918366
+            0.0,
+            0.0
           ]
         },
         "terracore - fixed-pipeline": {
-          "mean": 0.3469387755102041,
+          "mean": 0.4489795918367347,
           "ci95": [
-            0.20408163265306123,
-            0.4897959183673469
+            0.30612244897959184,
+            0.5918367346938775
           ]
         },
         "terracore - llm-agent (llama3:8b)": {
           "mean": 0.10204081632653061,
           "ci95": [
-            -0.10204081632653061,
-            0.30612244897959184
+            -0.04081632653061224,
+            0.24489795918367346
           ]
         }
       },
       "systems": {
         "terracore": {
           "summary": {
-            "accuracy": 0.7755102040816326,
-            "answerable_correct": 0.8918918918918919,
-            "unanswerable_refused": 0.4166666666666667,
-            "over_refusal": 0.02702702702702703,
-            "grounded_when_answering": 0.9444444444444444,
-            "unsupported_decimal_rate": 0.007380073800738007,
+            "accuracy": 0.8775510204081632,
+            "answerable_correct": 0.9090909090909091,
+            "unanswerable_refused": 0.8125,
+            "over_refusal": 0.0,
+            "grounded_when_answering": 0.7878787878787878,
+            "unsupported_decimal_rate": 0.04201680672268908,
             "invalid_citations": 0,
-            "mean_citations": 3.0408163265306123,
-            "seconds_per_question": 0.41583617852658644
+            "mean_citations": 1.9387755102040816,
+            "seconds_per_question": 0.5885296403145304
           },
           "by_category": {
             "performance": 1.0,
             "transfer": 1.0,
-            "scenes": 0.8333333333333334,
-            "licence": 0.8333333333333334,
-            "simulation": 0.6,
-            "unanswerable": 0.4166666666666667
+            "calibration": 0.0,
+            "scenes": 1.0,
+            "licence": 1.0,
+            "simulation": 1.0,
+            "event facts": 1.0,
+            "unanswerable": 0.8125
+          }
+        },
+        "terracore-v1": {
+          "summary": {
+            "accuracy": 0.5918367346938775,
+            "answerable_correct": 0.8181818181818182,
+            "unanswerable_refused": 0.125,
+            "over_refusal": 0.0,
+            "grounded_when_answering": 0.696969696969697,
+            "unsupported_decimal_rate": 0.01910828025477707,
+            "invalid_citations": 0,
+            "mean_citations": 3.5714285714285716,
+            "seconds_per_question": 0.5874168532235282
+          },
+          "by_category": {
+            "performance": 1.0,
+            "transfer": 1.0,
+            "calibration": 0.0,
+            "scenes": 1.0,
+            "licence": 1.0,
+            "simulation": 0.25,
+            "event facts": 1.0,
+            "unanswerable": 0.125
           }
         },
         "terracore-no-critic": {
           "summary": {
-            "accuracy": 0.7755102040816326,
-            "answerable_correct": 0.8648648648648649,
-            "unanswerable_refused": 0.5,
-            "over_refusal": 0.05405405405405406,
-            "grounded_when_answering": 0.9428571428571428,
-            "unsupported_decimal_rate": 0.007380073800738007,
+            "accuracy": 0.8775510204081632,
+            "answerable_correct": 0.9090909090909091,
+            "unanswerable_refused": 0.8125,
+            "over_refusal": 0.0,
+            "grounded_when_answering": 0.7878787878787878,
+            "unsupported_decimal_rate": 0.04201680672268908,
             "invalid_citations": 0,
-            "mean_citations": 2.795918367346939,
-            "seconds_per_question": 0.4084358604586854
+            "mean_citations": 1.9387755102040816,
+            "seconds_per_question": 0.568765251003966
           },
           "by_category": {
             "performance": 1.0,
             "transfer": 1.0,
-            "scenes": 0.6666666666666666,
-            "licence": 0.8333333333333334,
-            "simulation": 0.6,
-            "unanswerable": 0.5
+            "calibration": 0.0,
+            "scenes": 1.0,
+            "licence": 1.0,
+            "simulation": 1.0,
+            "event facts": 1.0,
+            "unanswerable": 0.8125
           }
         },
         "fixed-pipeline": {
           "summary": {
             "accuracy": 0.42857142857142855,
-            "answerable_correct": 0.5675675675675675,
+            "answerable_correct": 0.6363636363636364,
             "unanswerable_refused": 0.0,
             "over_refusal": 0.0,
-            "grounded_when_answering": 0.6756756756756757,
+            "grounded_when_answering": 0.7272727272727273,
             "unsupported_decimal_rate": 0.0,
             "invalid_citations": 0,
             "mean_citations": 1.0,
-            "seconds_per_question": 0.44598266056605745
+            "seconds_per_question": 0.6216022579037414
           },
           "by_category": {
-            "performance": 0.5333333333333333,
-            "transfer": 0.8,
-            "scenes": 0.16666666666666666,
-            "licence": 0.6666666666666666,
-            "simulation": 0.8,
+            "performance": 0.8,
+            "transfer": 1.0,
+            "calibration": 0.0,
+            "scenes": 0.0,
+            "licence": 1.0,
+            "simulation": 0.5,
+            "event facts": 0.6666666666666666,
             "unanswerable": 0.0
           }
         },
         "llm-agent (llama3:8b)": {
           "summary": {
-            "accuracy": 0.673469387755102,
-            "answerable_correct": 0.5675675675675675,
+            "accuracy": 0.7755102040816326,
+            "answerable_correct": 0.6666666666666666,
             "unanswerable_refused": 1.0,
-            "over_refusal": 0.13513513513513514,
-            "grounded_when_answering": 0.8125,
-            "unsupported_decimal_rate": 0.09302325581395349,
+            "over_refusal": 0.12121212121212122,
+            "grounded_when_answering": 0.9310344827586207,
+            "unsupported_decimal_rate": 0.0,
             "invalid_citations": 0,
-            "mean_citations": 1.2244897959183674,
-            "seconds_per_question": 3.949393471892999
+            "mean_citations": 0.9591836734693877,
+            "seconds_per_question": 3.2253656484642805
           },
           "by_category": {
-            "performance": 0.5333333333333333,
-            "transfer": 0.2,
-            "scenes": 0.3333333333333333,
-            "licence": 0.8333333333333334,
-            "simulation": 1.0,
+            "performance": 0.9,
+            "transfer": 0.5,
+            "calibration": 0.3333333333333333,
+            "scenes": 0.0,
+            "licence": 1.0,
+            "simulation": 0.75,
+            "event facts": 0.6666666666666666,
             "unanswerable": 1.0
           }
         }
@@ -3595,7 +3773,7 @@
       "rq": "RQ5",
       "question": "Are specialised agents more reliable than one agent or a fixed workflow?",
       "verdict": "supported against the fixed pipeline only",
-      "basis": "49 questions. Accuracy: TerraCore 0.78, terracore-no-critic 0.78, fixed-pipeline 0.43, llm-agent (llama3:8b) 0.67. TerraCore answers 89% of answerable questions correctly but refuses only 42% of unanswerable ones; the LLM agent refuses 100% but answers 57%. Removing the critic changes accuracy by +0.00.",
+      "basis": "49 questions. Accuracy: TerraCore 0.88, terracore-v1 0.59, terracore-no-critic 0.88, fixed-pipeline 0.43, llm-agent (llama3:8b) 0.78. TerraCore answers 91% of answerable questions correctly but refuses only 81% of unanswerable ones; the LLM agent refuses 100% but answers 67%. Removing the critic changes accuracy by +0.00.",
       "limits": "Questions written by the author of TerraCore's rules; gold facts come from the same store; one LLM (llama3:8b); 49 questions."
     },
     {

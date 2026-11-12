@@ -551,6 +551,76 @@ success index: 1 day GRU 0.83 vs persistence 0.78; 3 days boosting 0.58 vs 0.55;
 - Limits: the target is a simulation, not gauges; one river cell per site may
   not be the flooded river; no ensemble weather forecasts as input.
 
+**E1 completed: fusion with a missing sensor** (`terramind fusion-eval`; water
+IoU on pixels valid in both sensors; ensembles of 5 seeds, dropout model 3).
+
+| Model | test | Bolivia |
+|---|---|---|
+| Radar | 0.657 | 0.640 |
+| Optical | 0.851 | 0.809 |
+| Early fusion | 0.841 | 0.761 |
+| Early fusion, optical bands missing (radar only) | 0.280 | 0.029 |
+| Early fusion, radar bands missing | 0.378 | 0.334 |
+| Early fusion + modality dropout | 0.823 | 0.788 |
+| ... + dropout, optical missing | 0.508 | 0.414 |
+| ... + dropout, radar missing | 0.823 | 0.791 |
+| Late fusion, equal weights | 0.804 | 0.753 |
+| Late fusion, weight tuned on valid (0.9 optical) | 0.850 | 0.810 |
+
+- **The plain fused model is useless without optical data:** 0.28 on test and
+  0.03 on Bolivia, far below the radar-only model. It learned to rely on the
+  optical bands, so it fails exactly when clouds remove them.
+- Modality dropout fixes the optical-only case completely and lifts radar-only
+  to 0.51 / 0.41, still clearly below a dedicated radar model (0.66 / 0.64).
+- Late fusion with a tuned weight puts 0.9 on optical and matches optical
+  alone; no combination beats the optical model on these labels.
+- Practical reading: run a dedicated radar model alongside the optical one
+  and switch on availability; neither fusion method gives a model that is good
+  in both conditions. Caveat as before: the labels favour optical.
+
+**RQ6 revisited: RL on the dispatch task, final runs** (waste cost 0.5; 3 seeds
+each, trained on all 45 scenarios; utility, difference to the calibrated
+planner):
+
+| Policy | test | Bolivia |
+|---|---|---|
+| Calibrated planner | 0.596 | 0.511 |
+| PPO from scratch | 0.404 (-0.192) | 0.327 (-0.184) |
+| Imitation of the planner only | 0.455 (-0.141) | 0.378 (-0.134) |
+| Imitation + PPO | 0.575 (-0.021 [-0.047, +0.005]) | 0.520 (+0.009 [-0.037, +0.056]) |
+| Imitation + PPO, no uncertainty input | 0.564 (-0.032 [-0.058, -0.010]) | 0.501 (-0.010) |
+| Imitation + MAPPO (global critic) | 0.559 (-0.037 [-0.061, -0.016]) | 0.511 (+0.000) |
+
+- RL adds a lot on top of imitation (+0.12 on test), and imitation + PPO comes
+  within noise of the planner, but does not beat it on test. The +0.025 seen on
+  the 10 tuning scenarios did not hold. RQ6 stays "not supported".
+- The uncertainty input helps PPO a little (+0.011 on test, +0.019 on Bolivia;
+  not separately tested for significance).
+- The MAPPO global critic is no better than the local critic here.
+
+**E10: flooded road points** (`terramind roads`). 446 chips, OSM vehicle roads
+(ODbL) densified to ~20 m points: 813k labelled points, 2.4% flooded. Features
+per point: water probability from the radar model with that event held out
+(out-of-sample for every chip), VV/VH, Copernicus DEM elevation features, slope,
+distance to predicted water, road class, degree. Cut-offs tuned on valid.
+
+| Method | test F1 (78 chips) | Bolivia F1 (6 chips, 85 flooded points) |
+|---|---|---|
+| Radar water probability >= 0.5 | 0.624 | 0.339 |
+| Same, cut-off tuned on valid | 0.626 | 0.330 |
+| MLP on point features, 3 seeds | 0.617 ± 0.012 | 0.307 ± 0.029 |
+| GraphSAGE on the road graph, 3 seeds | 0.599 ± 0.027 | 0.453 ± 0.107 |
+
+- **Negative result:** neither terrain, road class nor the road graph adds
+  anything over thresholding the flood map at the point. The graph network is
+  not better than the per-point network on test.
+- Bolivia is too small to read (85 flooded points; seed spread 0.11).
+- A first run without tuned cut-offs scored the learned models far lower (0.34
+  and 0.43 on test) because class weighting made them over-predict; tuning the
+  cut-off on validation was needed for a fair comparison.
+- Limits: labels are pixel water at the road point, not road passability; DEM
+  is 30 m resampled to 10 m; OSM coverage varies by country.
+
 **Storage, explorer and report.**
 
 - `src/terramind/storage`: a spatial database (PostGIS, or embedded DuckDB with

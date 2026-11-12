@@ -99,6 +99,13 @@ def _scores(pred, y):
     }
 
 
+def _best_cut(scores: np.ndarray, y: np.ndarray) -> float:
+    """Decision cut-off with the best F1 on the given (validation) scores."""
+    grid = np.unique(np.quantile(scores, np.linspace(0.5, 0.999, 200)))
+    f1 = [_scores(scores >= c, y)["f1"] or 0.0 for c in grid]
+    return float(grid[int(np.argmax(f1))])
+
+
 def _train(kind, train, valid, f, seed, device, epochs=150):
     torch.manual_seed(seed)
     model = (SAGE(f) if kind == "gnn" else MLP(f)).to(device)
@@ -157,19 +164,27 @@ def run(seeds=(0, 1, 2)) -> Path:
         "results": {},
     }
     prob_col = features.index("water_prob")
+    # Every method's cut-off is chosen on the validation split, then applied once.
+    raw = {s: np.concatenate([g["x"][:, prob_col] for g in by[s]]) for s in by}
+    yv = data_b["valid"][1].cpu().numpy().astype(bool)
+    prob_cut = _best_cut(raw["valid"], yv)
+    report["cutoffs"] = {"threshold": prob_cut}
     for split in ("test", "bolivia"):
         y = data_b[split][1].cpu().numpy().astype(bool)
-        raw = np.concatenate([g["x"][:, prob_col] for g in by[split]])
-        report["results"].setdefault(split, {})["threshold"] = _scores(raw >= 0.5, y)
+        report["results"].setdefault(split, {})["threshold"] = _scores(raw[split] >= 0.5, y)
+        report["results"][split]["threshold, cut-off tuned"] = _scores(raw[split] >= prob_cut, y)
     for kind in ("mlp", "gnn"):
         per_seed = {"test": [], "bolivia": []}
         for seed in seeds:
             model = _train(kind, data_b["train"], data_b["valid"], f, seed, device)
             with torch.no_grad():
+                xv_, _, sv_, dv_ = data_b["valid"]
+                cut = _best_cut(model(xv_, sv_, dv_).cpu().numpy(), yv)
+                report["cutoffs"].setdefault(kind, []).append(cut)
                 for split, rows in per_seed.items():
                     x, y, s, d = data_b[split]
                     rows.append(
-                        _scores((model(x, s, d) > 0).cpu().numpy(), y.cpu().numpy().astype(bool))
+                        _scores((model(x, s, d) >= cut).cpu().numpy(), y.cpu().numpy().astype(bool))
                     )
         for split, rows in per_seed.items():
             f1s = [r["f1"] for r in rows]

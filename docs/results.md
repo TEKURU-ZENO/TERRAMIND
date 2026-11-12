@@ -11,7 +11,7 @@ All simulation numbers are simulated outcomes, not field results.
 | RQ2 | Does the model generalise to flood events it was not trained on? | **supported, weakly tested** | Mean IoU drop when an event is held out: Radar (S1) +0.002, Optical (S2) +0.010, Fused (S1+S2) +0.007. | One seed per fold; held-out models train on more chips; other events from the same continent stay in training; no unseen sensor or climate test. |
 | RQ3 | Can uncertainty identify where the model should abstain? | **supported at pixel level** | Dropping the least confident 10% of pixels cuts the error rate to 53% of its value (Radar (S1), Bolivia), 29% of its value (Optical (S2), Bolivia), 25% of its value (Fused (S1+S2), Bolivia). | Pixel error is dominated by easy land pixels; no chip-level or decision-level test. |
 | RQ4 | Does semantic + spatial + temporal + graph retrieval improve geospatial QA? | **supported for the hybrid score; not supported for the graph component** | nDCG@10: vector 0.67, spatial 0.53, hybrid 0.79, hybrid + graph 0.79 on 36 queries. | Queries are generated from the corpus; weights are hand-set. |
-| RQ5 | Are specialised agents more reliable than one agent or a fixed workflow? | **supported against the fixed pipeline only** | 49 questions. Accuracy: TerraCore 0.78, terracore-no-critic 0.78, fixed-pipeline 0.43, llm-agent (llama3:8b) 0.67. TerraCore answers 89% of answerable questions correctly but refuses only 42% of unanswerable ones; the LLM agent refuses 100% but answers 57%. Removing the critic changes accuracy by +0.00. | Questions written by the author of TerraCore's rules; gold facts come from the same store; one LLM (llama3:8b); 49 questions. |
+| RQ5 | Are specialised agents more reliable than one agent or a fixed workflow? | **supported against the fixed pipeline only** | 49 questions. Accuracy: TerraCore 0.88, terracore-v1 0.59, terracore-no-critic 0.88, fixed-pipeline 0.43, llm-agent (llama3:8b) 0.78. TerraCore answers 91% of answerable questions correctly but refuses only 81% of unanswerable ones; the LLM agent refuses 100% but answers 67%. Removing the critic changes accuracy by +0.00. | Questions written by the author of TerraCore's rules; gold facts come from the same store; one LLM (llama3:8b); 49 questions. |
 | RQ6 | Does reinforcement learning beat heuristic and optimisation baselines in simulation? | **not supported** | PPO minus lookahead: -0.029 [-0.039, -0.019] on test, -0.024 [-0.041, -0.007] on bolivia. | Simulated; PPO with parameter sharing rather than full MAPPO; 45 training scenarios; no hyperparameter tuning. |
 | RQ7 | Does the integrated chain improve decision quality over separate parts? | **partly: perception matters, uncertainty and calibration barely do** | Giving the planner the radar ensemble instead of nothing is worth +0.268; the truth adds only +0.017 more. Calibration or uncertainty gave a gain whose interval excludes zero in 2 of 6 cases: radar ensemble, calibrated in 'scarce, no reveal' (+0.002); radar ensemble + uncertainty in 'scarce, no reveal' (+0.002). | Simulated task with smooth, cell-averaged need; errors cost nothing but time. |
 | RQ7b | When mistakes cost something, do calibration and uncertainty improve decisions? | **calibration: in some cases; uncertainty: rarely** | Harder task, 6 cases (waste cost x split). Calibrating the chance of a dry cell beat taking the map at face value, interval excluding zero, in 2: cost 0.5, test (+0.039); cost 1.0, test (+0.090). Adding ensemble disagreement to that calibration helped in 1: cost 1.0, test (+0.021). | Simulated; calibration is fitted on validation cells and does not transfer to Bolivia; invented cost structure. |
@@ -87,27 +87,30 @@ the honest uncertainty about performance on a new event.
 | ppo-nounc | 0.515 | [0.481, 0.550] | 0.527 | [0.476, 0.578] |
 | ppo-argmax | 0.290 | [0.253, 0.329] | 0.259 | [0.204, 0.318] |
 
-## Question answering (RQ5), 49 frozen questions (fingerprint 6e690dbc3f0c)
+## Question answering (RQ5), 49 frozen questions (fingerprint 3281dec01689)
 
 | System | Accuracy | Answerable correct | Unanswerable refused | Answerable refused | Cites a supporting record | Unsupported decimals |
 |---|---|---|---|---|---|---|
-| terracore | 0.78 | 0.89 | 0.42 | 0.03 | 0.94 | 0.007 |
-| terracore-no-critic | 0.78 | 0.86 | 0.50 | 0.05 | 0.94 | 0.007 |
-| fixed-pipeline | 0.43 | 0.57 | 0.00 | 0.00 | 0.68 | 0.000 |
-| llm-agent (llama3:8b) | 0.67 | 0.57 | 1.00 | 0.14 | 0.81 | 0.093 |
+| terracore | 0.88 | 0.91 | 0.81 | 0.00 | 0.79 | 0.042 |
+| terracore-v1 | 0.59 | 0.82 | 0.12 | 0.00 | 0.70 | 0.019 |
+| terracore-no-critic | 0.88 | 0.91 | 0.81 | 0.00 | 0.79 | 0.042 |
+| fixed-pipeline | 0.43 | 0.64 | 0.00 | 0.00 | 0.73 | 0.000 |
+| llm-agent (llama3:8b) | 0.78 | 0.67 | 1.00 | 0.12 | 0.93 | 0.000 |
 
-| System | performance | transfer | scenes | licence | simulation | unanswerable |
-|---|---|---|---|---|---|---|
-| terracore | 1.00 | 1.00 | 0.83 | 0.83 | 0.60 | 0.42 |
-| terracore-no-critic | 1.00 | 1.00 | 0.67 | 0.83 | 0.60 | 0.50 |
-| fixed-pipeline | 0.53 | 0.80 | 0.17 | 0.67 | 0.80 | 0.00 |
-| llm-agent (llama3:8b) | 0.53 | 0.20 | 0.33 | 0.83 | 1.00 | 1.00 |
+| System | performance | transfer | calibration | scenes | licence | simulation | event facts | unanswerable |
+|---|---|---|---|---|---|---|---|---|
+| terracore | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 1.00 | 1.00 | 0.81 |
+| terracore-v1 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.25 | 1.00 | 0.12 |
+| terracore-no-critic | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 1.00 | 1.00 | 0.81 |
+| fixed-pipeline | 0.80 | 1.00 | 0.00 | 0.00 | 1.00 | 0.50 | 0.67 | 0.00 |
+| llm-agent (llama3:8b) | 0.90 | 0.50 | 0.33 | 0.00 | 1.00 | 0.75 | 0.67 | 1.00 |
 
 Paired accuracy differences (bootstrap over questions):
 
-- terracore - terracore-no-critic: +0.000 [-0.061, +0.061]
-- terracore - fixed-pipeline: +0.347 [+0.204, +0.490]
-- terracore - llm-agent (llama3:8b): +0.102 [-0.102, +0.306]
+- terracore - terracore-v1: +0.286 [+0.163, +0.408]
+- terracore - terracore-no-critic: +0.000 [+0.000, +0.000]
+- terracore - fixed-pipeline: +0.449 [+0.306, +0.592]
+- terracore - llm-agent (llama3:8b): +0.102 [-0.041, +0.245]
 
 ## Simulated chain ablation (E8), test split, difference to the radar ensemble
 
@@ -143,6 +146,10 @@ area. Cells show utility, the paired difference to the calibrated planner with i
 | 0.5 | truth (oracle) | 0.657 (+0.061 [+0.029, +0.107]), 0.0 wasted | 0.662 (+0.151 [+0.026, +0.313]), 0.0 wasted |
 | 0.5 | ppo | 0.404 (-0.192 [-0.254, -0.132]), 1.3 wasted | 0.327 (-0.184 [-0.258, -0.105]), 3.0 wasted |
 | 0.5 | ppo, no uncertainty input | 0.424 (-0.172 [-0.231, -0.116]), 1.2 wasted | 0.337 (-0.174 [-0.250, -0.095]), 3.1 wasted |
+| 0.5 | imitation | 0.455 (-0.141 [-0.179, -0.108]), 1.4 wasted | 0.378 (-0.134 [-0.191, -0.082]), 1.9 wasted |
+| 0.5 | imitation + ppo | 0.575 (-0.021 [-0.047, +0.005]), 0.8 wasted | 0.520 (+0.009 [-0.037, +0.056]), 1.6 wasted |
+| 0.5 | imitation + ppo, no uncertainty input | 0.564 (-0.032 [-0.058, -0.010]), 0.7 wasted | 0.501 (-0.010 [-0.051, +0.030]), 1.4 wasted |
+| 0.5 | imitation + mappo | 0.559 (-0.037 [-0.061, -0.016]), 0.8 wasted | 0.511 (+0.000 [-0.046, +0.047]), 1.4 wasted |
 | 1.0 | raw map | 0.476 (-0.090 [-0.184, -0.017]), 1.7 wasted | 0.451 (+0.021 [-0.053, +0.103]), 2.2 wasted |
 | 1.0 | calibrated | 0.566 (+0.000 [+0.000, +0.000]), 0.4 wasted | 0.430 (+0.000 [+0.000, +0.000]), 1.5 wasted |
 | 1.0 | calibrated + uncertainty | 0.587 (+0.021 [+0.002, +0.044]), 0.4 wasted | 0.430 (-0.001 [-0.040, +0.036]), 1.6 wasted |

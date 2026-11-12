@@ -180,7 +180,8 @@ def collect() -> dict:
 
 def _agents() -> dict | None:
     """RQ5 summary without the per-question rows (those stay in the run file)."""
-    report = _load(runs_dir() / "agents-rq5.json")
+    # The held-out set if it has been run; the first (development) set otherwise.
+    report = _load(runs_dir() / "agents-rq5-test.json") or _load(runs_dir() / "agents-rq5.json")
     if not report:
         return None
     return {
