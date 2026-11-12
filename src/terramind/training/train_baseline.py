@@ -51,6 +51,30 @@ def load_chip(s1_path: Path, label_path: Path, modality: str, common_mask: bool 
     return np.concatenate(parts, axis=0), lab
 
 
+SENSOR_BANDS = {"s1": slice(0, 2), "s2": slice(2, 15)}  # channel order in fused input
+
+ARCH_NAMES = {
+    "unet": "unet-{modality} (random init)",
+    "unet-6band": "unet on the six Prithvi bands (random init)",
+    "prithvi": "Prithvi-EO-2.0-100M-TL encoder, fine-tuned, + UNETR-style decoder",
+    "prithvi-frozen": "Prithvi-EO-2.0-100M-TL encoder, frozen, + UNETR-style decoder",
+}
+
+
+def build_model(arch: str, modality: str) -> nn.Module:
+    if arch == "unet":
+        return UNet(in_channels=CHANNELS[modality])
+    if modality != "s2":
+        raise ValueError(f"arch '{arch}' needs the optical (s2) input")
+    from terramind.models import prithvi
+
+    if arch == "unet-6band":
+        return prithvi.BandSelect(UNet(in_channels=6))
+    if arch in ("prithvi", "prithvi-frozen"):
+        return prithvi.PrithviSeg(freeze_encoder=arch == "prithvi-frozen")
+    raise ValueError(f"unknown arch '{arch}'; choose from {sorted(ARCH_NAMES)}")
+
+
 # Decoded chips are kept in memory (float16 image, uint8 label) because reading
 # 15-band GeoTIFFs every epoch dominates training time. About 3.5 GB for the
 # full fused dataset.
@@ -74,9 +98,16 @@ class FloodChips(Dataset):
         augment: bool,
         modality: str = "s1",
         common_mask: bool = False,
+        dropout: float = 0.0,
+        zero: str | None = None,
     ):
+        """`dropout` (fused input only): probability of hiding the optical bands, and
+        separately of hiding the radar bands, for one training sample (never both).
+        `zero`: "s1" or "s2" bands set to zero for every sample, to evaluate a fused
+        model with one sensor missing."""
         self.pairs, self.crop, self.augment = pairs, crop, augment
         self.modality, self.common_mask = modality, common_mask
+        self.dropout, self.zero = dropout, zero
 
     def __len__(self) -> int:
         return len(self.pairs)
@@ -84,6 +115,14 @@ class FloodChips(Dataset):
     def __getitem__(self, i: int):
         s1_path, label_path = self.pairs[i]
         img, lab = cached_chip(s1_path, label_path, self.modality, self.common_mask)
+        if self.modality == "s1s2":
+            hide = self.zero
+            if self.dropout:
+                r = random.random()
+                hide = "s2" if r < self.dropout else ("s1" if r < 2 * self.dropout else hide)
+            if hide:
+                img = img.copy()
+                img[SENSOR_BANDS[hide]] = 0.0
         if self.crop:
             h, w = lab.shape
             y, x = random.randint(0, h - self.crop), random.randint(0, w - self.crop)
@@ -108,11 +147,14 @@ def evaluate(
     device: str,
     modality: str = "s1",
     common_mask: bool = False,
+    zero: str | None = None,
 ) -> dict:
     """Pooled metrics plus a per-event breakdown."""
     model.eval()
     per_event: dict[str, Confusion] = defaultdict(Confusion)
-    dataset = FloodChips(pairs, crop=None, augment=False, modality=modality, common_mask=common_mask)
+    dataset = FloodChips(
+        pairs, crop=None, augment=False, modality=modality, common_mask=common_mask, zero=zero
+    )
     loader = DataLoader(dataset, batch_size=4)
     for img, lab, events in loader:
         pred = model(img.to(device)).argmax(1).cpu().numpy()
@@ -149,6 +191,8 @@ def run(
     device: str | None = None,
     modality: str = "s1",
     holdout_event: str | None = None,
+    modality_dropout: float = 0.0,
+    arch: str = "unet",
 ) -> Path:
     """Train one model and write report.json.
 
@@ -203,15 +247,24 @@ def run(
     # on the same pixels.
     common = "s2" in modality
 
-    model = UNet(in_channels=CHANNELS[modality]).to(device)
-    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    model = build_model(arch, modality).to(device)
+    groups = (
+        model.param_groups(lr)
+        if hasattr(model, "param_groups")
+        else [{"params": model.parameters(), "lr": lr}]
+    )
+    opt = torch.optim.AdamW(groups, lr=lr, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.OneCycleLR(
-        opt, max_lr=lr, total_steps=epochs * max(1, -(-len(splits["train"]) // batch_size))
+        opt,
+        max_lr=[g["lr"] for g in groups],
+        total_steps=epochs * max(1, -(-len(splits["train"]) // batch_size)),
     )
     loss_fn = nn.CrossEntropyLoss(ignore_index=IGNORE_INDEX)
     scaler = torch.amp.GradScaler(device, enabled=device == "cuda")
     loader = DataLoader(
-        FloodChips(splits["train"], crop=crop, augment=True, modality=modality),
+        FloodChips(
+            splits["train"], crop=crop, augment=True, modality=modality, dropout=modality_dropout
+        ),
         batch_size=batch_size,
         shuffle=True,
     )
@@ -234,9 +287,9 @@ def run(
             total, n = total + loss.item(), n + 1
         entry = {"epoch": epoch, "train_loss": total / max(n, 1)}
         if splits["valid"]:
-            entry["valid_iou"] = evaluate(
-                model, splits["valid"], device, modality, common
-            )["pooled"]["iou"]
+            entry["valid_iou"] = evaluate(model, splits["valid"], device, modality, common)[
+                "pooled"
+            ]["iou"]
             # Model selection uses the validation split only, never test or Bolivia.
             if (entry["valid_iou"] or 0.0) > best_iou:
                 best_iou = entry["valid_iou"] or 0.0
@@ -253,15 +306,19 @@ def run(
         / "baselines"
         / "runs"
         / datetime.now(UTC).strftime(
-            (f"loeo-{holdout_event}-{modality}" if holdout_event else f"unet-{modality}")
+            (f"loeo-{holdout_event}-{modality}" if holdout_event else f"{arch}-{modality}")
+            + ("-md" if modality_dropout else "")
             + "-%Y%m%dT%H%M%SZ"
         )
     )
     out_dir.mkdir(parents=True, exist_ok=True)
     torch.save(model.state_dict(), out_dir / "model.pt")
+    variant = arch if arch != "unet" else ("modality-dropout" if modality_dropout else None)
     report = {
-        "model": f"unet-{modality} (random init)",
+        "model": ARCH_NAMES[arch].format(modality=modality),
+        "arch": arch,
         "modality": modality,
+        "variant": variant,
         "eval_common_mask": common,
         "holdout_event": holdout_event,
         "dataset": "sen1floods11 hand-labelled",
@@ -273,6 +330,7 @@ def run(
             "lr": lr,
             "crop": crop,
             "seed": seed,
+            "modality_dropout": modality_dropout,
         },
         "train_chips": len(splits["train"]),
         "history": history,
@@ -282,5 +340,15 @@ def run(
             if name != "train" and pairs
         },
     }
+    if modality == "s1s2":
+        # The same model with one sensor missing at test time.
+        report["results_missing_sensor"] = {
+            f"without_{hide}": {
+                name: evaluate(model, splits[name], device, modality, common, zero=hide)
+                for name in ("test", "bolivia")
+                if splits.get(name)
+            }
+            for hide in ("s2", "s1")
+        }
     (out_dir / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     return out_dir

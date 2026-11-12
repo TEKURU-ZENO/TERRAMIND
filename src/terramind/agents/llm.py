@@ -26,6 +26,24 @@ class OllamaLLM:
     def __init__(self, model: str = "llama3:8b", host: str = "http://127.0.0.1:11434"):
         self.model, self.host = model, host
 
+    def generate(self, prompt: str) -> str | None:
+        """Raw completion at temperature 0; None if the server is unreachable."""
+        try:
+            res = requests.post(
+                f"{self.host}/api/generate",
+                json={
+                    "model": self.model,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {"temperature": 0, "seed": 0},
+                },
+                timeout=300,
+            )
+            res.raise_for_status()
+            return res.json().get("response", "").strip() or None
+        except requests.RequestException:
+            return None
+
     def rewrite(self, question: str, findings: str) -> str | None:
         try:
             res = requests.post(

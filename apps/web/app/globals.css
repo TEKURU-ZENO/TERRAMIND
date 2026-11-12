@@ -393,6 +393,27 @@ dt {
   padding-inline: 8px;
 }
 
+.summary {
+  border-left: 2px solid var(--accent);
+  padding-left: 8px;
+}
+
+.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  text-align: left;
+}
+
+.view-toggle {
+  margin-top: 10px;
+}
+
+.view-toggle button {
+  text-transform: none;
+}
+
 .situation {
   display: grid;
   gap: 8px;

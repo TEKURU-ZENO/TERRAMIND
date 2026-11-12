@@ -87,6 +87,7 @@ type Situation = {
   flags: string[];
   sections: { title: string; statements: { text: string; evidence: string[]; simulated: boolean }[] }[];
   caveats: string[];
+  summary?: { text: string | null; accepted: boolean; reason: string | null };
 };
 
 type SimEpisode = {
@@ -175,6 +176,7 @@ export default function Explorer() {
   const [error, setError] = useState<string | null>(null);
 
   const [tab, setTab] = useState<"benchmark" | "events" | "ask" | "simulate">("benchmark");
+  const [view3d, setView3d] = useState(false);
   const [policy, setPolicy] = useState("lookahead");
   const [episode, setEpisode] = useState<SimEpisode | null>(null);
   const [simStep, setSimStep] = useState(0);
@@ -233,6 +235,15 @@ export default function Explorer() {
             maxzoom: 19,
             attribution: "© OpenStreetMap contributors",
           },
+          // Public terrain tiles on AWS Open Data (Terrarium encoding), for the 3D view.
+          dem: {
+            type: "raster-dem",
+            tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
+            tileSize: 256,
+            maxzoom: 14,
+            encoding: "terrarium",
+            attribution: "Terrain: Mapzen Terrain Tiles on AWS (SRTM, GMTED, ETOPO1 and others)",
+          },
         },
         layers: [
           { id: "background", type: "background", paint: { "background-color": "#0b1120" } },
@@ -246,6 +257,13 @@ export default function Explorer() {
               "raster-brightness-max": 0.5,
               "raster-contrast": 0.15,
             },
+          },
+          {
+            id: "hillshade",
+            type: "hillshade",
+            source: "dem",
+            layout: { visibility: "none" },
+            paint: { "hillshade-exaggeration": 0.35, "hillshade-shadow-color": "#020617" },
           },
         ],
       },
@@ -563,14 +581,24 @@ export default function Explorer() {
       .catch((err) => setError(err.message));
   };
 
-  const loadSituation = (chipId: string) => {
+  const loadSituation = (chipId: string, narrate = false) => {
     setLoadingSituation(true);
     setError(null);
-    getJson<Situation>(`/api/report/${encodeURIComponent(chipId)}`)
+    getJson<Situation>(`/api/report/${encodeURIComponent(chipId)}${narrate ? "?narrate=true" : ""}`)
       .then(setSituation)
       .catch((err) => setError(err.message))
       .finally(() => setLoadingSituation(false));
   };
+
+  // 3D: globe projection, terrain and hillshade.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    map.setProjection({ type: view3d ? "globe" : "mercator" });
+    map.setTerrain(view3d ? { source: "dem", exaggeration: 1.5 } : null);
+    map.setLayoutProperty("hillshade", "visibility", view3d ? "visible" : "none");
+    map.easeTo({ pitch: view3d ? 55 : 0, duration: 800 });
+  }, [ready, view3d]);
 
   const flyTo = (b: Bounds, maxZoom = 12) =>
     mapRef.current?.fitBounds([[b[0], b[1]], [b[2], b[3]]], {
@@ -673,6 +701,14 @@ export default function Explorer() {
               Model: {chips.model.name}, {chips.model.seeds.length} seeds
             </p>
           )}
+          <div className="pills view-toggle">
+            <button aria-pressed={!view3d} onClick={() => setView3d(false)}>
+              2D map
+            </button>
+            <button aria-pressed={view3d} onClick={() => setView3d(true)}>
+              3D globe
+            </button>
+          </div>
         </header>
 
         <div className="tabs" role="tablist">
@@ -1042,6 +1078,21 @@ export default function Explorer() {
                   Reliability {situation.reliability}
                 </p>
                 <p>{situation.recommendation}</p>
+                {situation.summary?.accepted && (
+                  <p className="summary">{situation.summary.text}</p>
+                )}
+                {situation.summary && !situation.summary.accepted && (
+                  <p className="muted">Summary not shown: {situation.summary.reason}.</p>
+                )}
+                {!situation.summary && (
+                  <button
+                    className="link"
+                    disabled={loadingSituation}
+                    onClick={() => loadSituation(selected.id, true)}
+                  >
+                    {loadingSituation ? "Writing…" : "Plain-language summary (local LLM)"}
+                  </button>
+                )}
                 {situation.flags.length > 0 && (
                   <ul className="caveats">
                     {situation.flags.map((f) => (

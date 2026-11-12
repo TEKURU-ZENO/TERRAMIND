@@ -71,3 +71,23 @@ def test_live_stac_search_returns_sentinel2_scenes():
     event = registry.load_events()["kerala-2018"]
     records = stac.search("sentinel-2-l2a", event.bbox, event.start, event.end, limit=5)
     assert records and all(r.collection == "sentinel-2-l2a" for r in records)
+
+
+def test_event_bootstrap_interval_contains_the_pooled_iou():
+    from terramind.validation.results import _counts, event_bootstrap
+
+    def event(tp, fp, fn):
+        water = tp + fn
+        return {
+            "iou": tp / (tp + fp + fn),
+            "precision": tp / (tp + fp),
+            "recall": tp / water,
+            "water_pixels": water,
+        }
+
+    run = {"A": event(90, 10, 10), "B": event(20, 30, 50), "C": event(60, 5, 20)}
+    tp, fp, fn = _counts(run["B"])
+    assert (round(tp), round(fp), round(fn)) == (20, 30, 50)
+    pooled = 170 / (170 + 45 + 80)
+    lo, hi = event_bootstrap([run, run])["ci95"]
+    assert lo < pooled < hi and lo >= 0.2 - 1e-9 and hi <= 90 / 110 + 1e-9

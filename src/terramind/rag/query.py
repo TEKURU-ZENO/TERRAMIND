@@ -39,6 +39,7 @@ INTENT_KEYWORDS = {
     "simulation": [
         "simulat", "policy", "policies", "teams", "allocat", "planner", "ppo", "reinforcement",
         "response strateg", "what if", "what happens if", "decision",
+        "dispatch", "wasted", "false alarm",
     ],
 }  # fmt: skip
 
@@ -88,6 +89,15 @@ def _time_window(text: str) -> tuple[str | None, str | None]:
     if iso:
         days = sorted(date(int(y), int(m), int(d)) for y, m, d in iso)
         return days[0].isoformat(), days[-1].isoformat()
+    # A range of months in one year: "November-December 2015",
+    # "between November and December 2015".
+    span = re.search(
+        r"\b([A-Za-z]{3,9})\s*(?:-|to|and|until|through)\s*([A-Za-z]{3,9})\.?\s+(\d{4})\b", text
+    )
+    if span and span.group(1).lower() in MONTHS and span.group(2).lower() in MONTHS:
+        y = int(span.group(3))
+        m1, m2 = sorted((MONTHS[span.group(1).lower()], MONTHS[span.group(2).lower()]))
+        return date(y, m1, 1).isoformat(), date(y, m2, calendar.monthrange(y, m2)[1]).isoformat()
     month = re.search(r"\b([A-Za-z]{3,9})\.?\s+(\d{4})\b", text)
     if month and month.group(1).lower() in MONTHS:
         y, m = int(month.group(2)), MONTHS[month.group(1).lower()]

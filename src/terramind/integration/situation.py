@@ -56,7 +56,9 @@ def build(chip_id: str, depot: int = 0) -> dict:
     predicted = float((data.pred[i] * weight).sum())
     calibrated = float((data.calibrated[i] * weight).sum())
     disagreement = float((data.unc[i] * weight).sum())
-    all_disagreement = (data.unc * data.known).sum((1, 2)) / np.maximum(data.known.sum((1, 2)), 1e-6)
+    all_disagreement = (data.unc * data.known).sum((1, 2)) / np.maximum(
+        data.known.sum((1, 2)), 1e-6
+    )
     rank = float((all_disagreement < disagreement).mean())
     perception = [
         _statement(
@@ -96,7 +98,9 @@ def build(chip_id: str, depot: int = 0) -> dict:
     else:
         reliability = "good"
     if split == "train":
-        flags.append("This chip was in the model's training data, so its map is better than it would be on new ground.")
+        flags.append(
+            "This chip was in the model's training data, so its map is better than it would be on new ground."
+        )
     if rank >= 0.9:
         flags.append("Ensemble disagreement on this chip is in the top 10% of all chips.")
 
@@ -161,3 +165,48 @@ def build(chip_id: str, depot: int = 0) -> dict:
         ],
         "thresholds": THRESHOLDS,
     }
+
+
+NARRATE_PROMPT = """Write a short plain-language summary (at most five sentences) of this flood
+situation report for a non-specialist. Rules: use only the statements below; keep
+every number exactly as written; say clearly which parts are simulated; add no new
+facts, numbers, places or dates; no preamble.
+
+Recommendation: {recommendation}
+Flags:
+{flags}
+Statements:
+{statements}
+"""
+
+
+def narrate(report: dict, llm=None) -> dict:
+    """A local LLM's plain-language summary, kept only if it adds no numbers.
+
+    Returns {"text", "accepted", "reason"}. The structured report stays the source
+    of truth; the summary is a convenience and is dropped when it cannot be checked.
+    """
+    import re
+
+    from terramind.agents.llm import OllamaLLM
+
+    llm = llm or OllamaLLM()
+    statements = [
+        ("[simulated] " if st["simulated"] else "") + st["text"]
+        for sec in report["sections"]
+        for st in sec["statements"]
+    ]
+    source = "\n".join([report["recommendation"], *report["flags"], *statements])
+    prompt = NARRATE_PROMPT.format(
+        recommendation=report["recommendation"],
+        flags="\n".join(f"- {f}" for f in report["flags"]) or "- none",
+        statements="\n".join(f"- {s}" for s in statements),
+    )
+    draft = llm.generate(prompt) if hasattr(llm, "generate") else llm.rewrite("", prompt)
+    if not draft:
+        return {"text": None, "accepted": False, "reason": "the local model gave no answer"}
+    allowed = set(re.findall(r"\d+\.?\d*", source))
+    extra = sorted(set(re.findall(r"\d+\.?\d*", draft)) - allowed)
+    if extra:
+        return {"text": None, "accepted": False, "reason": f"draft added numbers {extra[:5]}"}
+    return {"text": draft.strip(), "accepted": True, "reason": None}

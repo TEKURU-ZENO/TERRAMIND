@@ -49,7 +49,9 @@ def test_sim_episode_route():
     assert r.status_code == 200 and body["simulated"] is True
     assert len(body["positions"]) == body["horizon"] + 1 == len(body["served"])
     assert body["served"] == sorted(body["served"]) and body["served"][-1] <= 1 + 1e-5
-    assert client.get("/api/sim/episode", params={"chip": chip, "policy": "nope"}).status_code == 404
+    assert (
+        client.get("/api/sim/episode", params={"chip": chip, "policy": "nope"}).status_code == 404
+    )
     assert client.get("/api/sim/episode", params={"chip": "../x"}).status_code == 404
 
 

@@ -119,6 +119,16 @@ Answers are assembled from stored evidence by fixed rules and checked by a
 critic; the system abstains when nothing supports an answer. `--llm` lets a
 local Ollama model reword a verified answer.
 
+```bash
+.venv/Scripts/terramind agents-eval
+```
+
+Runs 49 frozen questions (12 unanswerable) through TerraCore, TerraCore
+without its critic, a fixed retrieve-and-answer pipeline, and one local LLM
+agent (`--llm-model`, default llama3:8b, served by Ollama; `--no-llm` skips
+it), and writes per-question results to
+`experiments/baselines/runs/agents-rq5.json`.
+
 ## TerraSim (simulated flood response)
 
 A simulated decision problem built on the real chips: three teams move over a
@@ -143,6 +153,22 @@ an oracle that sees the truth, and any trained PPO policies on fixed episodes,
 and writes `experiments/sim/runs/e7-<modality>.json`. The Simulate tab of the
 explorer replays an episode on a chip.
 
+### Harder task: dispatch with a cost for mistakes
+
+```bash
+.venv/Scripts/terramind dispatch-eval
+```
+
+```bash
+.venv/Scripts/terramind sim-train --task dispatch --waste-cost 0.5 --seed 0
+```
+
+In the dispatch task (E9) moving and deploying are separate, a deployment to
+a dry cell costs a penalty, and nothing is revealed for free. `dispatch-eval`
+compares planners that take the flood map at face value, calibrate the chance
+of a dry cell, or also use ensemble disagreement, plus any PPO policies
+trained for the same waste cost.
+
 ## End-to-end chain
 
 ```bash
@@ -164,16 +190,30 @@ can be cited.
 Each training run writes `report.json` (config, git commit, per-split and
 per-event IoU/F1) under `experiments/baselines/runs/`.
 
+## Validation and paper package
+
+```bash
+.venv/Scripts/terramind validate
+```
+
+Collects every headline number from run files, adds intervals that resample
+flood events, evaluates a verdict for each research question as a rule over
+those numbers, and checks the protocol. It writes `docs/results.md`,
+`experiments/results.json` and the figures in `paper/figures/`. The paper
+draft is `paper/draft.md`; a ten-minute demo script is `docs/demo.md`.
+
 ## Layout
 
 ```
 configs/       dataset registry, flood events, splits
 src/terramind/ modular monolith: ingestion, processing, models, training,
-               uncertainty, explorer, api
+               uncertainty, explorer, api, evidence, rag, agents, sim,
+               integration, validation
 apps/web/      Earth Explorer front end
-experiments/   baselines, ablations, transfer, evaluation
-research/      literature notes, methodology, results, paper
-docs/          specification and weekly research log
+experiments/   baselines, transfer, simulation runs, results.json
+research/      literature notes
+paper/         draft and generated figures
+docs/          specification, research log, generated results, demo script
 tests/
 ```
 

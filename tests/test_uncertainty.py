@@ -28,12 +28,16 @@ def test_abstaining_on_low_confidence_reduces_error():
     z, t = _calibrated_sample()
     s = cal.summary(z, t)
     assert s["error_at_100pct_coverage"] == pytest.approx(1 - s["accuracy"], abs=1e-6)
-    assert s["error_at_50pct_coverage"] < s["error_at_80pct_coverage"] < s["error_at_100pct_coverage"]
+    assert (
+        s["error_at_50pct_coverage"] < s["error_at_80pct_coverage"] < s["error_at_100pct_coverage"]
+    )
 
 
 def test_otsu_separates_two_modes():
     rng = np.random.default_rng(0)
-    values = np.clip(np.concatenate([rng.normal(0.2, 0.03, 5000), rng.normal(0.6, 0.03, 5000)]), 0, 1)
+    values = np.clip(
+        np.concatenate([rng.normal(0.2, 0.03, 5000), rng.normal(0.6, 0.03, 5000)]), 0, 1
+    )
     assert 0.3 < th.otsu_threshold(values) < 0.5
 
 

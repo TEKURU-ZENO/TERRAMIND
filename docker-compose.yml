@@ -23,6 +23,17 @@ services:
     volumes:
       - minio-data:/data
 
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?set in .env}
+    ports:
+      - "127.0.0.1:7474:7474"
+      - "127.0.0.1:7687:7687"
+    volumes:
+      - neo4j-data:/data
+
 volumes:
   postgis-data:
   minio-data:
+  neo4j-data:

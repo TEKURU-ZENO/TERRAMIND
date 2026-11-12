@@ -40,9 +40,7 @@ def stac_search(
     from terramind.ingestion import stac
 
     event = registry.load_events()[event_id]
-    records = stac.search(
-        collection, event.bbox, event.start, event.end, catalog, max_cloud, limit
-    )
+    records = stac.search(collection, event.bbox, event.start, event.end, catalog, max_cloud, limit)
     path = stac.write_manifest(
         records,
         data_dir() / "manifests" / f"{event_id}__{collection}__{catalog}.json",
@@ -80,6 +78,8 @@ def train_baseline(
     seed: int = 0,
     modality: str = "s1",
     holdout_event: str | None = None,
+    modality_dropout: float = 0.0,
+    arch: str = "unet",
 ) -> None:
     """Train a U-Net flood baseline (modality: s1, s2 or s1s2) and write report.json.
 
@@ -96,6 +96,8 @@ def train_baseline(
         seed=seed,
         modality=modality,
         holdout_event=holdout_event,
+        modality_dropout=modality_dropout,
+        arch=arch,
     )
     typer.echo(f"report: {out / 'report.json'}")
 
@@ -205,13 +207,39 @@ def build_sim(modality: str = "s1") -> None:
 
 @app.command("sim-train")
 def sim_train(
-    modality: str = "s1", seed: int = 0, updates: int = 400, uncertainty: bool = True
+    modality: str = "s1",
+    seed: int = 0,
+    updates: int = 400,
+    uncertainty: bool = True,
+    task: str = "response",
+    waste_cost: float = 1.0,
+    imitate_batches: int = 0,
+    critic_warmup: int = 0,
+    holdout: int = 0,
+    lr: float = 3e-4,
+    entropy: float = 0.01,
+    name: str = "",
+    critic: str = "local",
 ) -> None:
-    """Train a PPO policy for the simulated flood-response problem."""
+    """Train a PPO policy. --task dispatch uses the harder task with a waste cost."""
     from terramind.sim import ppo
 
     out = ppo.train(
-        ppo.PPOConfig(modality=modality, seed=seed, updates=updates, use_uncertainty=uncertainty)
+        ppo.PPOConfig(
+            modality=modality,
+            seed=seed,
+            updates=updates,
+            use_uncertainty=uncertainty,
+            task=task,
+            waste_cost=waste_cost,
+            imitate_batches=imitate_batches,
+            critic_warmup=critic_warmup,
+            holdout=holdout,
+            lr=lr,
+            entropy=entropy,
+            name=name,
+            critic=critic,
+        )
     )
     typer.echo(f"run: {out}")
 
@@ -247,24 +275,32 @@ def chain_ablation() -> None:
     report = json.loads(out.read_text(encoding="utf-8"))
     typer.echo("SIMULATED. Fixed lookahead planner; only its input changes.")
     for setting, r in report["settings"].items():
-        typer.echo(f"\n{setting} {r['config']}  uncertainty weight {r['uncertainty_weight']['chosen']}")
+        typer.echo(
+            f"\n{setting} {r['config']}  uncertainty weight {r['uncertainty_weight']['chosen']}"
+        )
         names = list(next(iter(r["splits"].values()))["stages"])
         for name in names:
             cells = []
             for split, s in r["splits"].items():
                 m = s["stages"][name]
                 lo, hi = m["vs_reference_ci95"]
-                cells.append(f"{split} {m['auc']:.3f} ({m['vs_reference']:+.3f} [{lo:+.3f},{hi:+.3f}])")
+                cells.append(
+                    f"{split} {m['auc']:.3f} ({m['vs_reference']:+.3f} [{lo:+.3f},{hi:+.3f}])"
+                )
             typer.echo(f"  {name:<34}" + "   ".join(cells))
     typer.echo(f"-> {out}")
 
 
 @app.command()
-def report(chip_id: str) -> None:
-    """Situation report for one chip: perception, reliability and a simulated response."""
+def report(chip_id: str, llm: bool = False) -> None:
+    """Situation report for one chip: perception, reliability and a simulated response.
+    --llm adds a local LLM's plain-language summary, kept only if it adds no numbers."""
     from terramind.integration import situation
 
     r = situation.build(chip_id)
+    if llm:
+        s = situation.narrate(r)
+        typer.echo(f"summary: {s['text']}" if s["accepted"] else f"summary dropped: {s['reason']}")
     typer.echo(f"{r['chip']} ({r['event']}, {r['split']})  reliability: {r['reliability']}")
     typer.echo(f"recommendation: {r['recommendation']}")
     for flag in r["flags"]:
@@ -276,6 +312,155 @@ def report(chip_id: str) -> None:
             typer.echo(f"  - {st['text']}{mark}  <{', '.join(st['evidence'])}>")
     for caveat in r["caveats"]:
         typer.echo(f"  caveat: {caveat}")
+
+
+@app.command("agents-eval")
+def agents_eval(llm_model: str = "llama3:8b", no_llm: bool = False, split: str = "dev") -> None:
+    """RQ5: compare TerraCore, its first version, a no-critic ablation, a fixed pipeline and
+    one LLM agent. --split test runs the held-out questions."""
+    from terramind.agents import evaluate
+
+    out = evaluate.run(None if no_llm else llm_model, split)
+    report = json.loads(out.read_text(encoding="utf-8"))
+    typer.echo(
+        f"{report['split']}: {len(report['questions'])} questions, fingerprint {report['fingerprint']}"
+    )
+    for name, s in report["systems"].items():
+        m = s["summary"]
+        typer.echo(
+            f"{name:<26} accuracy {m['accuracy']:.2f}  answerable {m['answerable_correct']:.2f}  "
+            f"refused unanswerable {m['unanswerable_refused']:.2f}  "
+            f"unsupported decimals {m['unsupported_decimal_rate']:.2f}  "
+            f"{m['seconds_per_question']:.1f}s/q"
+        )
+        typer.echo("    " + "  ".join(f"{c} {v:.2f}" for c, v in s["by_category"].items()))
+    typer.echo(f"-> {out}")
+
+
+@app.command("dispatch-eval")
+def dispatch_eval(modality: str = "s1") -> None:
+    """E9: the harder simulated task, where deploying to a dry cell costs something."""
+    from terramind.sim import dispatch
+
+    out = dispatch.run(modality)
+    report = json.loads(out.read_text(encoding="utf-8"))
+    typer.echo("SIMULATED. utility = (flooded area served - cost x wasted deployments) / total.")
+    for split, skills in report["cell_skill"].items():
+        cells = ", ".join(
+            f"{n}: Brier {s['brier']:.4f} AUC {s['auc']:.3f}" for n, s in skills.items()
+        )
+        typer.echo(f"dry-cell prediction on {split}: {cells}")
+    for cost, r in report["settings"].items():
+        typer.echo(f"\nwaste cost {cost}")
+        for name in next(iter(r["splits"].values()))["policies"]:
+            cells = []
+            for split, s in r["splits"].items():
+                m = s["policies"][name]
+                lo, hi = m["vs_reference_ci95"]
+                cells.append(
+                    f"{split} {m['utility']:.3f} ({m['vs_reference']:+.3f} [{lo:+.3f},{hi:+.3f}]) "
+                    f"waste {m['wasted_deployments']:.1f}/{m['deployments']:.0f}"
+                )
+            typer.echo(f"  {name:<27}" + "   ".join(cells))
+    typer.echo(f"-> {out}")
+
+
+@app.command("fusion-eval")
+def fusion_eval() -> None:
+    """E1: late fusion, modality dropout and fused models with a sensor missing."""
+    from terramind.training import fusion
+
+    out = fusion.run()
+    report = json.loads(out.read_text(encoding="utf-8"))
+    typer.echo(
+        f"late fusion optical weight (tuned on valid): {report['late_fusion_optical_weight']}"
+    )
+    for name, r in report["results"].items():
+        typer.echo(
+            f"  {name:<38}test IoU {r['test']['iou']:.3f}  Bolivia IoU {r['bolivia']['iou']:.3f}"
+        )
+    typer.echo(f"-> {out}")
+
+
+@app.command("forecast-fetch")
+def forecast_fetch() -> None:
+    """Download GloFAS discharge and ERA5 precipitation at the event sites (Open-Meteo)."""
+    from terramind.ingestion import openmeteo
+
+    typer.echo(openmeteo.fetch())
+
+
+@app.command("forecast")
+def forecast() -> None:
+    """E3: forecast discharge and flood-threshold exceedance 1, 3 and 7 days ahead."""
+    from terramind.forecast import discharge
+
+    out = discharge.run()
+    report = json.loads(out.read_text(encoding="utf-8"))
+    for lead, r in report["leads"].items():
+        nse = "  ".join(f"{m} {v:.3f}" for m, v in r["median_nse"].items())
+        typer.echo(f"lead {lead} d  median NSE: {nse}")
+    typer.echo(f"-> {out}")
+
+
+@app.command("roads")
+def roads(fetch: bool = True) -> None:
+    """E10: OSM road graphs on the chips and a graph network for flooded road points."""
+    from terramind.roads import gnn, graph, osm
+
+    if fetch:
+        osm.fetch()
+    graph.build_all()
+    out = gnn.run()
+    report = json.loads(out.read_text(encoding="utf-8"))
+    for split, r in report["results"].items():
+        t = r["threshold"]["f1"]
+        typer.echo(
+            f"{split}: F1 threshold {t:.3f}  mlp {r['mlp']['f1_mean']:.3f}  gnn {r['gnn']['f1_mean']:.3f}"
+        )
+    typer.echo(f"-> {out}")
+
+
+@app.command("db-load")
+def db_load() -> None:
+    """Load chips, scenes and evidence into PostGIS (TERRAMIND_DATABASE_URL) or DuckDB."""
+    from terramind.storage.spatial import open_store
+
+    store = open_store()
+    typer.echo(f"{type(store).__name__}: {store.load()}")
+
+
+@app.command("graph-load")
+def graph_load() -> None:
+    """Load the evidence graph into Neo4j (TERRAMIND_NEO4J_URL, TERRAMIND_NEO4J_PASSWORD)."""
+    from terramind.storage.graphdb import EvidenceGraph
+
+    g = EvidenceGraph()
+    try:
+        typer.echo(g.load())
+    finally:
+        g.close()
+
+
+@app.command("publish-objects")
+def publish_objects() -> None:
+    """Upload map layers and run reports to MinIO (TERRAMIND_S3_*) or the local object store."""
+    from terramind.storage.objects import publish
+
+    typer.echo(publish())
+
+
+@app.command()
+def validate(figures: bool = True) -> None:
+    """Collect all results, check the protocol, and write docs/results.md and figures."""
+    from terramind.validation import report as rep
+
+    out = rep.run(figures=figures)
+    for c in out["claims"]:
+        typer.echo(f"{c['rq']}: {c['verdict']}")
+    for c in out["checks"]:
+        typer.echo(f"{'pass' if c['ok'] else 'FAIL'}  {c['check']} ({c['detail']})")
+    typer.echo(f"-> {out['markdown']}, {out['json']}, {len(out['figures'])} figures")
 
 
 if __name__ == "__main__":

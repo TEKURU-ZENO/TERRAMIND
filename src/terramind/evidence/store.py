@@ -521,6 +521,34 @@ def _simulations(by_event: dict[str, list[dict]]) -> list[Evidence]:
                             "difference": m["vs_reference"],
                         },
                     )
+
+    e9 = sim_dir / "e9-dispatch-s1.json"
+    if e9.exists():
+        report = json.loads(e9.read_text(encoding="utf-8"))
+        for cost, result in report["settings"].items():
+            for split, block in result["splits"].items():
+                for policy, m in block["policies"].items():
+                    lo, hi = m["vs_reference_ci95"]
+                    slug = policy.replace(" + ", "-").replace(", ", "-").replace(" ", "-")
+                    slug = slug.replace("(", "").replace(")", "")
+                    add(
+                        f"simulation:e9:cost{cost}:{split}:{slug}",
+                        f"Dispatch with waste cost {cost} on {split}: {policy}",
+                        f"in the dispatch task, where a deployment to a dry cell costs {cost} "
+                        f"flooded cells, on {SIM_SPLITS[split]} the planner using {policy} reaches "
+                        f"utility {m['utility']:.3f} with {m['wasted_deployments']:.1f} wasted "
+                        f"deployments per episode, {m['vs_reference']:+.3f} relative to the "
+                        f"calibrated planner (95% interval {lo:+.3f} to {hi:+.3f}).",
+                        split,
+                        "terramind dispatch-eval",
+                        {
+                            "experiment": "e9",
+                            "waste_cost": float(cost),
+                            "policy": policy,
+                            "utility": m["utility"],
+                            "difference": m["vs_reference"],
+                        },
+                    )
     return records
 
 

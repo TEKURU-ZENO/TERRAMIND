@@ -44,6 +44,18 @@ def _feature(chip: dict) -> dict:
     }
 
 
+@lru_cache(maxsize=1)
+def _spatial_store():
+    """A spatial database if TERRAMIND_DATABASE_URL or TERRAMIND_SPATIAL=duckdb is set."""
+    import os
+
+    if os.environ.get("TERRAMIND_DATABASE_URL") or os.environ.get("TERRAMIND_SPATIAL") == "duckdb":
+        from terramind.storage.spatial import open_store
+
+        return open_store()
+    return None
+
+
 @app.get("/api/health")
 def health() -> dict:
     return {"status": "ok"}
@@ -96,10 +108,17 @@ def chips(
         selected = [c for c in selected if c["split"] == split]
     if bbox:
         try:
-            query = box(*[float(v) for v in bbox.split(",")])
+            values = [float(v) for v in bbox.split(",")]
+            query = box(*values)
         except (ValueError, TypeError):
             raise HTTPException(422, "bbox must be west,south,east,north") from None
-        selected = [c for c in selected if box(*c["bounds"]).intersects(query)]
+        db = _spatial_store()
+        if db is not None:
+            # Spatial database (PostGIS or DuckDB) when one is configured.
+            ids = set(db.in_bbox("chips", values))
+            selected = [c for c in selected if c["id"] in ids]
+        else:
+            selected = [c for c in selected if box(*c["bounds"]).intersects(query)]
     return {
         "type": "FeatureCollection",
         "model": _index()["model"],
@@ -222,14 +241,18 @@ def sim_episode(
 
 
 @app.get("/api/report/{chip_id}")
-def situation_report(chip_id: str) -> dict:
+def situation_report(chip_id: str, narrate: bool = False) -> dict:
     """Perception, reliability and a simulated response for one chip, with evidence ids."""
     from terramind.integration import situation
 
     if not CHIP_ID.match(chip_id):
         raise HTTPException(404, "unknown chip")
     try:
-        return situation.build(chip_id)
+        report = situation.build(chip_id)
+        if narrate:
+            # A local LLM's summary, kept only if it adds no numbers.
+            report["summary"] = situation.narrate(report)
+        return report
     except LookupError as err:
         raise HTTPException(404, str(err)) from None
     except FileNotFoundError as err:

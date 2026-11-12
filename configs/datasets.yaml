@@ -1,10 +1,11 @@
 # Dataset and licence registry.
 #
 # Every dataset must have an entry here before code reads it.
-# `licence_verified: false` means the licence text below is from memory and has
-# NOT been checked against the provider's current terms. Check it, set the flag
-# to true and fill `licence_checked_on` before redistributing anything derived
-# from that dataset or publishing results.
+# `licence_verified: true` means the licence below was read on the provider's own
+# page or licence document (`licence_source`) on `licence_checked_on`.
+# `licence_verified: false` means it could not be confirmed there; check before
+# redistributing anything derived from that dataset or publishing results.
+# Nothing here is legal advice.
 
 datasets:
   - id: sentinel-1-grd
@@ -14,8 +15,14 @@ datasets:
     stac_collection: sentinel-1-grd
     modality: sar
     resolution: 10 m
-    licence: Copernicus Sentinel data terms (free, full and open; attribution required)
-    licence_verified: false
+    licence: >-
+      Copernicus Sentinel data legal notice (EU Regulation 1159/2013): free, full
+      and open access; reproduction, distribution, adaptation and modification
+      allowed; no warranty
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice
+    attribution: Contains modified Copernicus Sentinel data [Year]
     redistribution: allowed-with-attribution
     used_for: [flood-mapping]
 
@@ -26,8 +33,14 @@ datasets:
     stac_collection: sentinel-2-l2a
     modality: optical
     resolution: 10-60 m
-    licence: Copernicus Sentinel data terms (free, full and open; attribution required)
-    licence_verified: false
+    licence: >-
+      Copernicus Sentinel data legal notice (EU Regulation 1159/2013): free, full
+      and open access; reproduction, distribution, adaptation and modification
+      allowed; no warranty
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice
+    attribution: Contains modified Copernicus Sentinel data [Year]
     redistribution: allowed-with-attribution
     used_for: [land-cover, flood-mapping]
 
@@ -38,31 +51,54 @@ datasets:
     stac_collection: landsat-c2-l2
     modality: optical-thermal
     resolution: 30 m
-    licence: US public domain
-    licence_verified: false
+    licence: >-
+      US public domain; no restrictions on use or redistribution of Landsat data
+      downloaded from USGS (credit requested, not required)
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://www.usgs.gov/faqs/are-there-any-restrictions-use-or-redistribution-landsat-data
+    attribution: Landsat data courtesy of the U.S. Geological Survey
     redistribution: allowed
     used_for: [urban-heat, land-use-change]
 
   - id: cop-dem-glo-30
     name: Copernicus DEM GLO-30
-    provider: ESA / Copernicus
-    access_url: https://dataspace.copernicus.eu/
+    provider: ESA / Copernicus (DLR, Airbus)
+    access_url: https://registry.opendata.aws/copernicus-dem/
     stac_collection: cop-dem-glo-30
     modality: terrain
     resolution: 30 m
-    licence: Copernicus DEM licence (free with attribution)
-    licence_verified: false
+    licence: >-
+      Licence for Copernicus DEM GLO-30 (Full, Free & Open): worldwide,
+      non-exclusive, no time limit; notice required; redistributors must pass on
+      the obligations and the liability disclaimer
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://documentation.dataspace.copernicus.eu/APIs/SentinelHub/Data/DEM/resources/license/License-COPDEM-30.pdf
+    attribution: >-
+      produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus
+      Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European
+      Union and ESA; all rights reserved
     redistribution: allowed-with-attribution
-    used_for: [terrain, hydrology]
+    used_for: [terrain, hydrology, road-graph-features]
+    notes: >
+      Read from the public COG tiles on AWS Open Data. Redistribution must add:
+      "The organisations in charge of the Copernicus programme by law or by
+      delegation do not incur any liability for any use of the Copernicus
+      WorldDEM-30".
 
   - id: srtm
     name: SRTM
     provider: NASA / USGS
-    access_url: https://www.earthdata.nasa.gov/
+    access_url: https://www.earthdata.nasa.gov/data/catalog/lpcloud-srtmgl30-002
     modality: terrain
     resolution: 30 m
-    licence: US public domain
-    licence_verified: false
+    licence: >-
+      NASA EOSDIS: openly shared, without restriction, under the EOSDIS Data Use
+      and Citation Guidance (citation requested)
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://www.earthdata.nasa.gov/data/catalog/lpcloud-srtmgl30-002
     redistribution: allowed
     used_for: [terrain]
 
@@ -72,10 +108,37 @@ datasets:
     access_url: https://cds.climate.copernicus.eu/
     modality: weather
     resolution: 0.25 deg, hourly
-    licence: CC BY 4.0 (previously Copernicus licence; confirm which applies)
-    licence_verified: false
+    licence: >-
+      CC BY 4.0, which replaced the Licence to use Copernicus Products on the
+      CDS, ADS and EWDS on 2 July 2025
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://forum.ecmwf.int/t/cc-by-licence-to-replace-licence-to-use-copernicus-products-on-02-july-2025/13464
+    attribution: Contains modified Copernicus Climate Change Service information [Year]
     redistribution: allowed-with-attribution
-    used_for: [weather-context]
+    used_for: [weather-context, discharge-forecasting]
+    notes: >
+      Daily precipitation at the event sites is read through Open-Meteo's
+      Historical Weather API (data CC BY 4.0; free API for non-commercial use,
+      under 10,000 calls a day).
+
+  - id: glofas-v4
+    name: GloFAS v4 river discharge reanalysis
+    provider: Copernicus Emergency Management Service (ECMWF), via Open-Meteo Flood API
+    access_url: https://open-meteo.com/en/docs/flood-api
+    modality: hydrology-model
+    resolution: 0.05 deg, daily, 1984-present
+    licence: >-
+      CC BY 4.0 (Copernicus EWDS moved to CC BY on 2 July 2025); Open-Meteo data
+      CC BY 4.0, free API for non-commercial use
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://forum.ecmwf.int/t/cc-by-licence-to-replace-licence-to-use-copernicus-products-on-02-july-2025/13464
+    attribution: Contains modified Copernicus Emergency Management Service information [Year]; Open-Meteo.com
+    redistribution: allowed-with-attribution
+    used_for: [discharge-forecasting]
+    notes: >
+      A simulated river, not gauge observations.
 
   - id: gpm-imerg
     name: GPM IMERG precipitation
@@ -83,8 +146,12 @@ datasets:
     access_url: https://gpm.nasa.gov/data/imerg
     modality: weather
     resolution: 0.1 deg, half-hourly
-    licence: NASA open data policy
-    licence_verified: false
+    licence: >-
+      NASA EOSDIS: openly shared, without restriction, under the EOSDIS Data Use
+      and Citation Guidance (citation requested)
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://www.earthdata.nasa.gov/data/catalog/ges-disc-gpm-3imergdf-07
     redistribution: allowed
     used_for: [rainfall]
 
@@ -94,8 +161,13 @@ datasets:
     access_url: https://www.worldpop.org/
     modality: population
     resolution: 100 m
-    licence: CC BY 4.0
-    licence_verified: false
+    licence: >-
+      CC BY 4.0, except WorldPop datasets derived from OpenStreetMap or Microsoft
+      building/road data, which are ODbL
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://worldpop-public-data.soton.ac.uk/GIS/Population/Individual_countries/TZA/United_Republic_of_Tanzania_100m_Population/licence.txt
+    attribution: WorldPop (www.worldpop.org), University of Southampton
     redistribution: allowed-with-attribution
     used_for: [exposure]
 
@@ -106,7 +178,12 @@ datasets:
     modality: population-built
     resolution: 10 m - 1 km
     licence: CC BY 4.0
-    licence_verified: false
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://human-settlement.emergency.copernicus.eu/GHSLhowToCite.php
+    attribution: >-
+      Cite Pesaresi et al. (2024), International Journal of Digital Earth 17(1),
+      plus the product's own reference; a generic website citation is not enough
     redistribution: allowed-with-attribution
     used_for: [exposure, built-environment]
 
@@ -116,10 +193,13 @@ datasets:
     access_url: https://www.openstreetmap.org/
     modality: vector-infrastructure
     resolution: vector
-    licence: ODbL 1.0 (share-alike applies to derived databases)
-    licence_verified: false
+    licence: Open Data Commons Open Database License (ODbL) 1.0; derived databases stay ODbL
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://www.openstreetmap.org/copyright
+    attribution: © OpenStreetMap contributors (with a link to openstreetmap.org/copyright)
     redistribution: share-alike
-    used_for: [roads, infrastructure]
+    used_for: [roads, infrastructure, road-graph]
 
   - id: geoboundaries
     name: geoBoundaries
@@ -127,10 +207,17 @@ datasets:
     access_url: https://www.geoboundaries.org/
     modality: vector-admin
     resolution: vector
-    licence: CC BY 4.0 (gbOpen release)
+    licence: >-
+      Varies by boundary file: the project describes itself as CC BY 4.0 / ODbL,
+      and each boundary's metadata names its own licence
     licence_verified: false
-    redistribution: allowed-with-attribution
+    licence_checked_on: "2026-11-12"
+    licence_source: https://github.com/wmgeolab/geoBoundaries
+    redistribution: unknown
     used_for: [admin-boundaries]
+    notes: >
+      Not one licence. Read the licence field of each boundary before use;
+      gbAuthoritative files are reported (secondary sources) to be non-commercial.
 
   - id: sen1floods11
     name: Sen1Floods11
@@ -138,13 +225,24 @@ datasets:
     access_url: https://github.com/cloudtostreet/Sen1Floods11
     modality: sar-optical-labels
     resolution: 10 m, 512x512 chips
-    licence: see repository; not confirmed
-    licence_verified: false
+    licence: >-
+      None stated: the GitHub API reports no licence and the repository has no
+      LICENSE file
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://api.github.com/repos/cloudtostreet/Sen1Floods11
+    attribution: >-
+      Bonafilia, Tellman, Anderson, Issenberg (2020), Sen1Floods11: a
+      georeferenced dataset to train and test deep learning flood algorithms
+      for Sentinel-1, CVPR Workshops, pp. 210-211
     redistribution: unknown
     used_for: [flood-segmentation-baseline]
     notes: >
       446 hand-labelled chips across 11 flood events. Official split holds out
-      Bolivia as a geographically unseen test set.
+      Bolivia as a geographically unseen test set. "Verified" here means it was
+      verified that no licence is given. Without one, default copyright applies:
+      ask the authors before redistributing chips or derived imagery. The
+      underlying Sentinel imagery is under the Copernicus terms.
 
   - id: xbd
     name: xBD / xView2
@@ -152,10 +250,15 @@ datasets:
     access_url: https://xview2.org/
     modality: optical-vhr-labels
     resolution: < 1 m
-    licence: CC BY-NC-SA 4.0 (non-commercial)
+    licence: CC BY-NC-SA 4.0 (non-commercial), per secondary sources
     licence_verified: false
+    licence_checked_on: "2026-11-12"
     redistribution: non-commercial-share-alike
     used_for: [damage-assessment]
+    notes: >
+      xview2.org did not show its terms to an automated reader; the licence
+      above comes from mirrors and forum posts quoting the challenge. Imagery is
+      from the Maxar Open Data Program, whose own terms may also apply. Not used.
 
   - id: spacenet
     name: SpaceNet
@@ -163,7 +266,42 @@ datasets:
     access_url: https://spacenet.ai/datasets/
     modality: optical-vhr-labels
     resolution: 0.3-0.5 m
-    licence: CC BY-SA 4.0
+    licence: >-
+      Varies by dataset ("Various" in the AWS registry); the main datasets are
+      CC BY-SA 4.0, some CC BY-NC or CC BY 4.0
     licence_verified: false
-    redistribution: share-alike
+    licence_checked_on: "2026-11-12"
+    licence_source: https://registry.opendata.aws/spacenet/
+    redistribution: unknown
     used_for: [buildings, roads]
+    notes: Check the specific SpaceNet release before use. Not used.
+
+  - id: prithvi-eo-2-100m-tl
+    name: Prithvi-EO-2.0-100M-TL weights
+    provider: IBM, NASA, Jülich Supercomputing Centre
+    access_url: https://huggingface.co/ibm-nasa-geospatial/Prithvi-EO-2.0-100M-TL
+    modality: model-weights
+    resolution: pretrained on HLS 30 m
+    licence: Apache License 2.0 (model card and source file header)
+    licence_verified: true
+    licence_checked_on: "2026-11-12"
+    licence_source: https://huggingface.co/ibm-nasa-geospatial/Prithvi-EO-2.0-100M-TL
+    attribution: Szwarcman et al. (2024), Prithvi-EO-2.0, arXiv:2412.02732
+    redistribution: allowed-with-attribution
+    used_for: [foundation-model-comparison]
+    notes: >
+      The encoder code in src/terramind/models/prithvi.py is adapted from the
+      repository's prithvi_mae.py and keeps IBM's Apache-2.0 notice.
+
+  - id: terrain-tiles-aws
+    name: Terrain Tiles (Terrarium) on AWS Open Data
+    provider: Mapzen / Linux Foundation (Tilezen), hosted by AWS
+    access_url: https://registry.opendata.aws/terrain-tiles/
+    modality: terrain-tiles
+    resolution: z0-z15 web tiles
+    licence: Combination of open sources (SRTM, GMTED, ETOPO1, national DEMs) with attribution
+    licence_verified: false
+    licence_checked_on: "2026-11-12"
+    redistribution: allowed-with-attribution
+    used_for: [explorer-3d-view]
+    notes: Display only in the explorer's 3D view. Attribution list not yet checked.

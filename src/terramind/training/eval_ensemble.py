@@ -29,9 +29,11 @@ EVAL_SPLITS = ("valid", "test", "bolivia")
 
 
 @torch.no_grad()
-def _member_probs(models, pairs, modality, device, common_mask):
+def _member_probs(models, pairs, modality, device, common_mask, zero=None):
     """Water probability per member: (probs [M, N] float32, target [N], chip index [N])."""
-    dataset = FloodChips(pairs, crop=None, augment=False, modality=modality, common_mask=common_mask)
+    dataset = FloodChips(
+        pairs, crop=None, augment=False, modality=modality, common_mask=common_mask, zero=zero
+    )
     probs, targets, chip_ids = [], [], []
     for i, (img, lab, _) in enumerate(DataLoader(dataset, batch_size=1)):
         keep = (lab[0] != IGNORE_INDEX).numpy()
@@ -70,7 +72,9 @@ def run(modality: str = "s1", epochs: int = 30, common_mask: bool = False) -> Pa
     device = "cuda" if torch.cuda.is_available() else "cpu"
     selected = select_runs(modality, epochs)
     if len(selected) < 2:
-        raise RuntimeError(f"need at least 2 seeds for modality '{modality}', found {len(selected)}")
+        raise RuntimeError(
+            f"need at least 2 seeds for modality '{modality}', found {len(selected)}"
+        )
     models = []
     for run_dir, _ in selected.values():
         model = UNet(in_channels=CHANNELS[modality]).to(device).eval()

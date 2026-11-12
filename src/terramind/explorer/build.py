@@ -95,7 +95,9 @@ def build(modality: str = "s1", epochs: int = 30) -> Path:
                 layers.insert(1, "optical")
 
             _save(
-                _overlay(label.shape, [(water, (56, 189, 248, 220)), (~known, (148, 163, 184, 110))]),
+                _overlay(
+                    label.shape, [(water, (56, 189, 248, 220)), (~known, (148, 163, 184, 110))]
+                ),
                 chip_dir / "label.png",
             )
             _save(_overlay(label.shape, [(pred, (250, 204, 21, 220))]), chip_dir / "prediction.png")

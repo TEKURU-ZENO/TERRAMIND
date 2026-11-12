@@ -184,3 +184,75 @@ def test_simulation_question_is_answered_from_stored_results_and_marked_simulate
 def test_simulation_question_abstains_when_no_results_are_stored(core):
     report = core.ask("Which response policy works best in the simulation?")
     assert report["verdict"] == "abstain"
+
+
+def test_rq5_grader_checks_facts_refusals_and_unsupported_decimals():
+    from terramind.agents.evaluate import Question, grade
+
+    store = {e.id: e for e in corpus()}
+    q = Question("q", "performance", "x", numbers=[0.628], support=["benchmark:s1:event:Bolivia"])
+    good = {
+        "text": "IoU is 0.628 [1].",
+        "cited": ["benchmark:s1:event:Bolivia"],
+        "abstained": False,
+    }
+    assert grade(q, good, store)["correct"] and grade(q, good, store)["grounded"]
+    pct = {**good, "text": "It reaches 62.8% IoU."}
+    assert grade(q, pct, store)["correct"]
+    wrong = {"text": "IoU is 0.640 and 0.628.", "cited": ["scene:a"], "abstained": False}
+    g = grade(q, wrong, store)
+    # Right number present, but 0.640 and 0.628 are not in the cited record.
+    assert g["correct"] and not g["grounded"] and g["unsupported_decimals"] == 2
+    made_up = {"text": "", "cited": ["benchmark:nope"], "abstained": True}
+    assert not grade(q, made_up, store)["correct"]
+    assert grade(q, made_up, store)["invalid_citations"] == 1
+
+    none = Question("n", "unanswerable", "x", answerable=False)
+    assert grade(none, made_up, store)["correct"]
+    assert not grade(none, good, store)["correct"]
+
+    count = Question("c", "scenes", "x", counts=[2])
+    assert grade(count, {"text": "- 2 scenes [1][2]", "cited": [], "abstained": False}, store)[
+        "correct"
+    ]
+    assert not grade(count, {"text": "12 scenes [2]", "cited": [], "abstained": False}, store)[
+        "correct"
+    ]
+
+
+def test_relevance_rules_refuse_unknown_names_and_unrecognised_questions(core):
+    # A place the store has never recorded.
+    r = core.ask("How well does the model perform in Jakarta?")
+    assert r["verdict"] == "abstain" and "Jakarta" in r["answer"]
+    # A known place, but a question no agent covers: no fallback to that place's scores.
+    assert core.ask("How many people died in Bolivia?")["verdict"] == "abstain"
+    # Dropping the dates without a place would count every scene in the store.
+    assert (
+        core.ask("How many Sentinel-2 scenes were acquired in March 2030?")["verdict"] == "abstain"
+    )
+
+
+def test_first_version_is_reproducible_with_relevance_off():
+    old = TerraCore(Retriever(corpus(), embedder=HashingEmbedder()), relevance=False)
+    r = old.ask("How many people died in Bolivia?")
+    assert r["verdict"] == "answer"  # the first version answered with Bolivia's scores
+
+
+def test_dataset_questions_match_names_and_refuse_unrecorded_attributes(core):
+    assert [e.id for e in core.named_datasets("What licence covers OpenStreetMap?")] == [
+        "dataset:openstreetmap"
+    ]
+    r = core.ask("Who funded the OpenStreetMap dataset?")
+    assert r["verdict"] == "abstain" and "licence" in r["answer"]
+
+
+def test_named_policy_and_month_range():
+    from terramind.agents.workflow import POLICY_WORDS, _named_policies
+    from terramind.rag.query import _time_window
+
+    assert _named_policies("what does the greedy policy score?", POLICY_WORDS) == ["greedy"]
+    assert _named_policies(
+        "the lookahead planner that sees the true flood extent", POLICY_WORDS
+    ) == ["oracle-lookahead"]
+    assert _time_window("between November and December 2015") == ("2015-11-01", "2015-12-31")
+    assert _time_window("November-December 2015") == ("2015-11-01", "2015-12-31")

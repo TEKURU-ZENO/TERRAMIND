@@ -49,7 +49,9 @@ def run() -> Path:
         scenario, depot = episodes(s1, TUNE_SPLIT)
         tuning = {
             beta: float(
-                _play(s1.truth, s1.pred, s1.unc, Lookahead(beta=beta), scenario, depot, config).mean()
+                _play(
+                    s1.truth, s1.pred, s1.unc, Lookahead(beta=beta), scenario, depot, config
+                ).mean()
             )
             for beta in BETAS
         }

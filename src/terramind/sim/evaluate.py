@@ -118,7 +118,9 @@ def run(modality: str = "s1", config: SimConfig | None = None) -> Path:
             rows[name] = _summary(mean_scores)
             seed_auc = [float(s["auc"].mean()) for s in per_seed]
             rows[name]["seeds"] = len(members)
-            rows[name]["auc_seed_std"] = float(np.std(seed_auc, ddof=1)) if len(members) > 1 else None
+            rows[name]["auc_seed_std"] = (
+                float(np.std(seed_auc, ddof=1)) if len(members) > 1 else None
+            )
             rows[name]["auc_by_seed"] = seed_auc
 
         # Paired differences on the same episodes.
@@ -150,7 +152,14 @@ def run(modality: str = "s1", config: SimConfig | None = None) -> Path:
     return out
 
 
-REPLAY_POLICIES = ("blind-lookahead", "greedy", "assignment", "lookahead", "oracle-lookahead", "ppo")
+REPLAY_POLICIES = (
+    "blind-lookahead",
+    "greedy",
+    "assignment",
+    "lookahead",
+    "oracle-lookahead",
+    "ppo",
+)
 
 
 def make_policy(name: str, modality: str = "s1"):
@@ -174,7 +183,9 @@ def make_policy(name: str, modality: str = "s1"):
     return table[name]()
 
 
-def replay(data: sc.Scenarios, chip_id: str, policy, depot: int = 0, config: SimConfig | None = None):
+def replay(
+    data: sc.Scenarios, chip_id: str, policy, depot: int = 0, config: SimConfig | None = None
+):
     """Play one episode and return every step, for display."""
     matches = np.flatnonzero(data.ids == chip_id)
     if len(matches) == 0:

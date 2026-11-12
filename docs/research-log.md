@@ -294,11 +294,304 @@ difference to the radar ensemble and its 95% interval:
 - Not built in Phase 7: PostGIS/MinIO/Neo4j, Cesium, an LLM-written report,
   forecasting.
 
+**Phase 8: validation and paper package.**
+
+- `terramind validate` regenerates `docs/results.md`, `experiments/results.json`
+  and four figures from run files, and evaluates each research question's
+  verdict as a rule over the numbers. Verdicts: RQ1 not supported; RQ2
+  supported, weakly tested; RQ3 supported at pixel level; RQ4 supported for the
+  hybrid score, not for the graph; RQ5 not tested; RQ6 not supported; RQ7
+  partly (perception matters, uncertainty and calibration barely do).
+- **New finding: event-level intervals are far wider than seed noise.**
+  Resampling the 10 test events gives test IoU intervals of [0.498, 0.749] for
+  radar, [0.764, 0.890] for optical and [0.765, 0.875] for fusion, against seed
+  std below 0.01. Earlier entries that read small differences off seed std
+  (for example optical against fusion on test, 0.845 against 0.834) overstate
+  what is known. Optical against radar still holds. The intervals are not
+  paired, so they are conservative for comparisons between inputs.
+- Protocol checks: 7 of 8 pass. The failing one is structural: the unseen
+  region is a single event, so no event-level interval can be formed for it.
+- Literature and licence check (2026-11-11, search results only; nothing read):
+  Sen1Floods11, Prithvi-EO-2.0, PANGAEA, GEO-Bench and Spatial-RAG exist with
+  the references now in the reading list; three citations remain unchecked.
+  The Sen1Floods11 repository states no licence, so the data must not be
+  redistributed. How its labels were drawn is still unverified.
+- Two of those papers cut against novelty claims: Spatial-RAG already describes
+  a hybrid spatial and semantic retriever, and PANGAEA's listing says foundation
+  models do not consistently beat a supervised U-Net.
+- Paper draft (`paper/draft.md`) reports the negative results as the main
+  finding; related work is left as TODO because the papers have not been read.
+  Demo script: `docs/demo.md`.
+
+**E9: a harder simulated task, where mistakes cost something.**
+
+- Why: E7/E8 could not separate policies because a wrong guess cost one step.
+- Task (`src/terramind/sim/dispatch.py`, `terramind dispatch-eval`): moving
+  and deploying are separate actions. A deployment takes a step and serves the
+  cell; if the cell is dry (under 5% water) it is wasted at a cost of
+  0.25, 0.5 or 1 fully flooded cells. Nothing is revealed until a team deploys,
+  then only the 3 x 3 cells around it. Utility = (flooded area served - cost x
+  wasted deployments) / total flooded area. Still invented; no exposure data.
+- Planner: deploy where expected water minus cost x P(dry) is positive. What
+  changes is P(dry): the map at face value; a logistic model of the prediction
+  fitted on validation cells ("calibrated"); the same with ensemble
+  disagreement as extra inputs.
+- Dry-cell prediction, Brier score: face value 0.152 / calibrated 0.084 / with
+  uncertainty 0.078 on test; 0.113 / 0.085 / 0.084 on Bolivia.
+
+Utility, with the paired difference to the calibrated planner:
+
+| Waste cost | Planner uses | Test (44) | Bolivia (11) |
+|---|---|---|---|
+| 0.25 | Map at face value | 0.597 (-0.013 [-0.033, +0.004]) | 0.592 (+0.015 [-0.001, +0.034]) |
+| 0.25 | Calibrated | 0.610 | 0.576 |
+| 0.25 | Calibrated + uncertainty | 0.610 (+0.000 [-0.012, +0.012]) | 0.573 (-0.003 [-0.030, +0.019]) |
+| 0.25 | Optical, calibrated | 0.636 (+0.026 [-0.002, +0.065]) | 0.640 (+0.064 [-0.004, +0.160]) |
+| 0.25 | Truth | 0.657 (+0.047) | 0.662 (+0.086) |
+| 0.5 | Map at face value | 0.557 (-0.039 [-0.086, -0.000]) | 0.545 (+0.034 [-0.015, +0.088]) |
+| 0.5 | Calibrated | 0.596 | 0.511 |
+| 0.5 | Calibrated + uncertainty | 0.598 (+0.002 [-0.007, +0.014]) | 0.519 (+0.008 [-0.021, +0.049]) |
+| 0.5 | Optical, calibrated | 0.624 (+0.028 [-0.007, +0.073]) | 0.628 (+0.117 [+0.015, +0.258]) |
+| 0.5 | Truth | 0.657 (+0.061) | 0.662 (+0.151) |
+| 1.0 | Map at face value | 0.476 (-0.090 [-0.184, -0.017]) | 0.451 (+0.021 [-0.053, +0.103]) |
+| 1.0 | Calibrated | 0.566 | 0.430 |
+| 1.0 | Calibrated + uncertainty | 0.587 (+0.021 [+0.002, +0.044]) | 0.430 (-0.001 [-0.040, +0.036]) |
+| 1.0 | Optical, calibrated | 0.585 (+0.019 [-0.041, +0.082]) | 0.616 (+0.186 [+0.031, +0.422]) |
+| 1.0 | Truth | 0.657 (+0.091) | 0.662 (+0.232) |
+
+- **The task now separates methods.** The gap between radar and the truth is
+  0.05-0.09 on test and 0.09-0.23 on Bolivia, against 0.02-0.04 before.
+- **Calibration helps in distribution and grows with the stakes:** on test it
+  is worth 0.013, 0.039 and 0.090 as the cost rises, with intervals excluding
+  zero at 0.5 and 1.0. Wasted deployments fall from 1.7 to 0.4-0.9 per episode.
+- **Calibration does not transfer.** On Bolivia the face-value map scores
+  higher at every cost (not significantly, 11 scenarios). A calibration fitted
+  on seen regions is no better than none on the unseen one. This is the same
+  effect seen at pixel level (temperature scaling half-fixed Bolivia ECE).
+- **Uncertainty helps once.** Adding ensemble disagreement gains 0.021
+  [0.002, 0.044] at the highest cost on test and nothing elsewhere. First
+  positive evidence for the thesis, and weak: 1 of 6 cases, and it would not
+  survive a correction for six comparisons.
+- **A better sensor is worth more than either** on Bolivia: optical gains
+  0.06-0.19 there.
+- Limits: 11 Bolivia scenarios; one planner; the cost structure and the 5% dry
+  threshold are invented; a wasted deployment is costed relative to each
+  scenario's total water, so small floods dominate the variance.
+**PPO on the dispatch task** (waste cost 0.5; 3 seeds each; 300 updates x 64
+episodes; team-id input added).
+
+| Policy | Test utility | vs calibrated planner | Bolivia utility | vs calibrated planner |
+|---|---|---|---|---|
+| Calibrated planner | 0.596 | | 0.511 | |
+| PPO | 0.404 | -0.192 [-0.254, -0.132] | 0.327 | -0.184 [-0.258, -0.105] |
+| PPO, no uncertainty input | 0.424 | -0.172 [-0.231, -0.116] | 0.337 | -0.174 [-0.250, -0.095] |
+
+- **RQ6 again not supported, by a wider margin.** PPO is about 0.19 below the
+  planner on both splits and below even the face-value planner (0.557).
+- It makes fewer deployments (32 against 40) and wastes more of them (1.3
+  against 0.6 on test, 3.0 against 1.8 on Bolivia).
+- The uncertainty input does not help PPO; the variant without it is slightly
+  ahead, within noise.
+- Training plateaued rather than ran out of time: seed 0's training utility
+  was 0.45 at update 150 and 0.45 at update 300. It also drops from 0.46 on
+  its training scenarios to 0.40 on test, so it partly memorises 45 scenarios.
+- The team-id input fixed the symmetry problem: taking the most likely move
+  now scores 0.37 on test against 0.40 for sampled moves, where before it
+  halved the score.
+- Limits: one hyperparameter setting, no tuning, a small network, 45 training
+  scenarios. This says PPO as configured loses, not that RL cannot do this.
+
+**RQ5: agents against a fixed pipeline and one LLM agent** (`terramind
+agents-eval`, `src/terramind/agents/evaluate.py`).
+
+- 49 frozen questions (fingerprint `6e690dbc3f0c`): 15 on model performance
+  by event, 5 on leave-one-event-out transfer, 6 scene counts, 6 licences,
+  5 simulation results, 12 that the store cannot answer (forecasts, unknown
+  places, deaths, rainfall, damage, evacuation, exposure, funding). Gold facts
+  come from the evidence store. The wording was fixed before any system ran.
+- Systems, all on the same hybrid retriever: TerraCore; TerraCore with a critic
+  that accepts everything; a fixed pipeline that answers with the top record
+  and never refuses; llama3:8b given the top 8 records and told to cite ids or
+  reply INSUFFICIENT EVIDENCE.
+
+| System | Accuracy | Answerable correct | Unanswerable refused | Answerable refused | Cites a supporting record | Decimals not in cited records |
+|---|---|---|---|---|---|---|
+| TerraCore | 0.78 | 0.89 | 0.42 | 0.03 | 0.94 | 0.007 |
+| TerraCore, no critic | 0.78 | 0.86 | 0.50 | 0.05 | 0.94 | 0.007 |
+| Fixed pipeline | 0.43 | 0.57 | 0.00 | 0.00 | 0.68 | 0.000 |
+| LLM agent (llama3:8b) | 0.67 | 0.57 | 1.00 | 0.14 | 0.81 | 0.093 |
+
+Paired accuracy differences, bootstrap over questions: TerraCore - fixed
+pipeline +0.35 [+0.20, +0.49]; TerraCore - LLM agent +0.10 [-0.10, +0.31];
+TerraCore - no critic 0.00 [-0.06, +0.06].
+
+- **RQ5 supported against the fixed pipeline only.** TerraCore is not
+  distinguishable from one LLM agent on 49 questions.
+- **The two fail in opposite directions.** TerraCore is right on 89% of
+  answerable questions but refuses only 5 of 12 unanswerable ones; the LLM
+  refuses all 12 but gets 57% of answerable ones and refuses 5 it could answer.
+- **The critic checks faithfulness, not relevance.** Asked about deaths,
+  rainfall or damage in a known flood, or about model accuracy in Jakarta or
+  Bangladesh, TerraCore returns true, correctly cited benchmark figures that
+  do not answer the question, and the critic passes them. This is the main
+  failure, and it is a design gap rather than a bug.
+- **The critic adds nothing here.** Its relax-and-retry fixed one scene count
+  and broke one refusal: asked for Mumbai scenes in 2023, the retry dropped
+  the date and, with no place resolved, counted all 154 Sentinel-2 scenes.
+- TerraCore also reports the best simulated policy when asked about a named
+  one (greedy, plain lookahead), and misreads "November-December 2015".
+- The LLM picks the wrong one of two similar records (held-out instead of
+  standard model) and cannot count scenes, since counts need more records
+  than its top 8. One answer quoted four chip scores without citing them.
+- The fixed pipeline fails whenever the top record is a near miss.
+- Limits: I wrote both TerraCore's rules and the questions, which favours
+  TerraCore; gold facts come from the same store the systems read; one small
+  local LLM; 49 questions. The LLM's answers vary slightly between runs (GPU
+  inference is not fully deterministic); two runs gave the same accuracy.
+- Not done, on purpose: fixing TerraCore's relevance check and rerunning on
+  these questions would tune to the test set. A fix needs a new question set.
+
+**2026-11-12: held-out question set frozen before any fix.** The 49 questions
+above become the development set ("dev", `6e690dbc3f0c`). A second set of 49
+("test", fingerprint `3281dec01689`) was written and frozen before TerraCore
+was changed: different wording and targets, no shared question text, two new
+categories (calibration, event facts) and 16 new unanswerable questions
+(fatalities, rainfall, insured losses, displacement, unknown places, a
+forecast, a real allocation, hospitals, water depth, elevation, damage, who
+labelled the data, river discharge). Protocol: develop the fix on dev only,
+then run every system once on test and report the result whatever it is.
+Caveat: the same person wrote the fix and both sets.
+
+**Relevance fixes (developed on dev only).** With `relevance=True` TerraCore
+refuses questions naming something absent from the whole store (a capitalised
+word not in any record), gives no default answer to a question whose type it
+does not recognise, drops dates on retry only when a place still narrows the
+search, reports the simulated policy and waste cost the question names, looks
+datasets up by name, refuses dataset attributes the store does not record, and
+parses month ranges. `relevance=False` reproduces the first version. On dev:
+0.80 -> 1.00 (expected; the fixes were built on it). Two of the fixes (waste
+cost, dataset names) touch question types I knew the held-out set contained.
+
+**RQ5 on the held-out set** (`terramind agents-eval --split test`, run once):
+
+| System | Accuracy | Answerable correct | Unanswerable refused |
+|---|---|---|---|
+| TerraCore (fixed) | 0.88 | 0.91 | 0.81 |
+| TerraCore first version | 0.59 | 0.82 | 0.12 |
+| TerraCore, no critic | 0.88 | 0.91 | 0.81 |
+| Fixed pipeline | 0.43 | 0.64 | 0.00 |
+| LLM agent (llama3:8b) | 0.78 | 0.67 | 1.00 |
+
+Paired: fixed - first version +0.29 [+0.16, +0.41]; fixed - LLM agent +0.10
+[-0.04, +0.24]; fixed - pipeline +0.45 [+0.31, +0.59]; critic adds 0.00.
+
+- The relevance fixes generalise: held-out refusals rose from 2 of 16 to 13 of
+  16 and nothing answerable was lost.
+- Still failing: all three calibration questions (the agents never look up
+  calibration records for a named place; not fixed because no dev question
+  needed it), "Predict next month's flood risk" ("predict" is not on the
+  forecast list), "Should rescue teams go to the Ahr valley or Sindh first?"
+  (routed to the simulation), and "average elevation of the Bolivia chips"
+  (answered with chip statistics).
+- TerraCore is still not distinguishable from one small LLM agent, and the
+  critic still changes nothing: every claim the agents build is faithful by
+  construction, so the critic never has anything to reject on real questions.
+
+**E2: foundation model (Prithvi-EO-2.0-100M-TL).** Encoder from IBM/NASA's
+Apache-2.0 checkpoint (strict weight load), UNETR-style decoder, same trainer,
+crops, schedule and splits as the U-Nets; encoder learning rate 0.05 x decoder.
+Six bands (B2, B3, B4, B8A, B11, B12) normalised with Prithvi's statistics.
+3 seeds each, water IoU:
+
+| Model | valid | test | Bolivia |
+|---|---|---|---|
+| U-Net, 13 optical bands (5 seeds) | 0.820 ± 0.011 | 0.845 ± 0.006 | 0.802 ± 0.006 |
+| U-Net, the same 6 bands | 0.818 ± 0.006 | 0.839 ± 0.007 | 0.782 ± 0.005 |
+| Prithvi, fine-tuned | 0.805 ± 0.002 | 0.817 ± 0.003 | 0.691 ± 0.022 |
+| Prithvi, frozen encoder | 0.786 ± 0.004 | 0.801 ± 0.002 | 0.662 ± 0.014 |
+
+- **Negative result:** the foundation model is worse than a small U-Net trained
+  from scratch on the same bands, by 0.02 on test and 0.09 on unseen Bolivia.
+  It transfers worse, not better. This agrees with PANGAEA's reported finding
+  that foundation models do not consistently beat a supervised U-Net.
+- Band choice explains little: six bands instead of thirteen costs the U-Net
+  0.006 on test and 0.02 on Bolivia.
+- Limits: one recipe and no tuning; Prithvi was pretrained on 30 m HLS and is
+  applied to 10 m Sentinel-2 without its time/location inputs; patch size 16
+  limits boundary detail; 3 seeds. The 300M and 600M models were not tried.
+
+**E3: discharge forecasting** (`terramind forecast-fetch`, `terramind
+forecast`). Target: GloFAS v4 reanalysis discharge at the largest river cell
+near each of the 15 event sites (searched within about 50 km where the nearest
+cells were trickles). Inputs: the last 30 days of discharge and ERA5
+precipitation, no future rain. Train 1991-2012, test 2017-2024; one model pooled
+over sites. Event dates: Sen1Floods11's own metadata file for 11 events,
+configs/events.yaml (unconfirmed) for 4.
+
+| Lead | Persistence NSE | Ridge | Gradient boosting | GRU | GRU error vs persistence |
+|---|---|---|---|---|---|
+| 1 day | 0.985 | 0.988 | 0.985 | 0.986 | -27% |
+| 3 days | 0.941 | 0.924 | 0.909 | 0.914 | -17% |
+| 7 days | 0.823 | 0.809 | 0.798 | 0.829 | -16% |
+
+(median NSE over sites; the last column is squared error on standardised log
+discharge.) Flood-threshold exceedance (Q > training 95th percentile), critical
+success index: 1 day GRU 0.83 vs persistence 0.78; 3 days boosting 0.58 vs 0.55;
+7 days persistence best (0.39).
+
+- Persistence is very hard to beat on a large slow river; only the GRU improves
+  on it at every lead, and only modestly.
+- **The model river misses real floods:** GloFAS exceeds its threshold within a
+  week of the satellite-observed flood at 10 of 13 test-period events; at
+  Paraguay, Somalia and Sri Lanka it does not, so no forecast of it could warn.
+- Flash floods are not forecastable this way: Kerala and Ahr are caught 1 day
+  ahead at best.
+- Pooling transfers: leave-one-site-out NSE at 3 days is within 0.05 of the
+  pooled model at every site.
+- Limits: the target is a simulation, not gauges; one river cell per site may
+  not be the flooded river; no ensemble weather forecasts as input.
+
+**Storage, explorer and report.**
+
+- `src/terramind/storage`: a spatial database (PostGIS, or embedded DuckDB with
+  the spatial extension) holding chips, scenes and evidence with geometry
+  indexes; an evidence graph loader and one-hop query for Neo4j; an object store
+  (MinIO, or local disk) for map layers and run reports. CLI `db-load`,
+  `graph-load`, `publish-objects`; the API uses the spatial database for bounding
+  boxes when `TERRAMIND_SPATIAL=duckdb` or `TERRAMIND_DATABASE_URL` is set.
+  docker-compose now has PostGIS, MinIO and Neo4j, with generated passwords in a
+  gitignored `.env`.
+- **Verified:** DuckDB loads 446 chips, 223 scenes and 928 evidence records and
+  returns the same bounding-box answers as the in-memory path (15 Bolivia chips,
+  18 Kerala Sentinel-2 scenes); 2,676 layers and 66 reports publish to the local
+  object store. **Not verified:** PostGIS, Neo4j and MinIO. Docker Desktop's
+  backend crashes on start because a dead socket file
+  (`%LOCALAPPDATA%\Docker\run\dockerInference`) cannot be removed without
+  administrator rights.
+- Explorer: a 2D map / 3D globe toggle (MapLibre globe projection, terrain and
+  hillshade from the AWS terrain tiles). Cesium was not used: MapLibre already
+  renders a globe with terrain and needs no access token.
+- LLM-written summary of the situation report (`terramind report --llm`, API
+  `?narrate=true`, explorer button): llama3:8b writes it; it is shown only if it
+  adds no number absent from the verified statements. The first attempt was
+  rejected for rounding 70.2% to 70: the guard is strict by design.
+
+**Licences and citations (2026-11-12).** 13 of 17 registry entries verified on
+the provider's own page or licence document (`licence_source` in
+configs/datasets.yaml). Changes from what was recorded: ERA5 is CC BY 4.0 since
+2 July 2025; the Copernicus DEM licence requires a specific notice and a
+liability disclaimer when redistributed; WorldPop products derived from OSM or
+Microsoft data are ODbL; GHSL asks for a specific paper citation. Not verified:
+geoBoundaries (licence varies per file), SpaceNet ("Various"), xBD (terms not
+readable; secondary sources say CC BY-NC-SA 4.0), terrain tiles. Sen1Floods11:
+confirmed that no licence is given. All eight cited works exist (none read in
+full); GeoAgentic-RAG (2026) is a multi-agent geospatial RAG, the closest prior
+work to TerraCore.
+
 **Open items.**
 
-- Verify every licence in `configs/datasets.yaml`.
-- Verify the citations in `research/literature/reading-list.md`.
-- Confirm event boxes and dates in `configs/events.yaml`.
-- More seeds for the leave-one-event-out folds; a size-matched control (same
-  number of training chips) to separate "unseen" from "more data".
-- Fusion: modality dropout, late fusion, radar-only evaluation of the fused model.
+- Fix Docker (delete the dead socket file as administrator, or reboot), then
+  verify PostGIS, Neo4j and MinIO.
+- Confirm event boxes and dates for the four candidate events.
+- More seeds for leave-one-event-out and a size-matched control.
+- Read the cited papers in full.

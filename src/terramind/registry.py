@@ -27,6 +27,8 @@ class Dataset(BaseModel):
     licence: str
     licence_verified: bool
     licence_checked_on: str | None = None
+    licence_source: str | None = None  # where the licence was read
+    attribution: str | None = None  # credit line the licence asks for
     redistribution: Redistribution
     used_for: list[str]
     stac_collection: str | None = None
